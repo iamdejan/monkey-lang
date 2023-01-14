@@ -6,24 +6,19 @@ import (
 	"monkey/token"
 )
 
-type TokenTest struct {
-	expectedType    token.TokenType
-	expectedLiteral string
-}
-
 func TestNextToken_Operators(t *testing.T) {
 	input := `=+(){},;`
 
-	tests := []TokenTest{
-		{token.Assign, "="},
-		{token.Plus, "+"},
-		{token.LeftParenthesis, "("},
-		{token.RightParenthesis, ")"},
-		{token.LeftBrace, "{"},
-		{token.RightBrace, "}"},
-		{token.Comma, ","},
-		{token.Semicolon, ";"},
-		{token.Eof, ""},
+	tests := []token.Token{
+		{Type: token.Assign, Literal: "="},
+		{Type: token.Plus, Literal: "+"},
+		{Type: token.LeftParenthesis, Literal: "("},
+		{Type: token.RightParenthesis, Literal: ")"},
+		{Type: token.LeftBrace, Literal: "{"},
+		{Type: token.RightBrace, Literal: "}"},
+		{Type: token.Comma, Literal: ","},
+		{Type: token.Semicolon, Literal: ";"},
+		{Type: token.Eof, Literal: ""},
 	}
 
 	testLexer(t, input, tests)
@@ -41,45 +36,45 @@ func TestNextToken_BasicCode(t *testing.T) {
 	let result = add(five, ten);
 	`
 
-	tests := []TokenTest{
-		{token.Let, "let"},
-		{token.Identifier, "five"},
-		{token.Assign, "="},
-		{token.Integer, "5"},
-		{token.Semicolon, ";"},
+	tests := []token.Token{
+		{Type: token.Let, Literal: "let"},
+		{Type: token.Identifier, Literal: "five"},
+		{Type: token.Assign, Literal: "="},
+		{Type: token.Integer, Literal: "5"},
+		{Type: token.Semicolon, Literal: ";"},
 
-		{token.Let, "let"},
-		{token.Identifier, "ten"},
-		{token.Assign, "="},
-		{token.Integer, "10"},
-		{token.Semicolon, ";"},
+		{Type: token.Let, Literal: "let"},
+		{Type: token.Identifier, Literal: "ten"},
+		{Type: token.Assign, Literal: "="},
+		{Type: token.Integer, Literal: "10"},
+		{Type: token.Semicolon, Literal: ";"},
 
-		{token.Let, "let"},
-		{token.Identifier, "add"},
-		{token.Assign, "="},
-		{token.Function, "fn"},
-		{token.LeftParenthesis, "("},
-		{token.Identifier, "x"},
-		{token.Comma, ","},
-		{token.Identifier, "y"},
-		{token.RightParenthesis, ")"},
-		{token.LeftBrace, "{"},
-		{token.Identifier, "x"},
-		{token.Plus, "+"},
-		{token.Identifier, "y"},
-		{token.Semicolon, ";"},
-		{token.RightBrace, "}"},
+		{Type: token.Let, Literal: "let"},
+		{Type: token.Identifier, Literal: "add"},
+		{Type: token.Assign, Literal: "="},
+		{Type: token.Function, Literal: "fn"},
+		{Type: token.LeftParenthesis, Literal: "("},
+		{Type: token.Identifier, Literal: "x"},
+		{Type: token.Comma, Literal: ","},
+		{Type: token.Identifier, Literal: "y"},
+		{Type: token.RightParenthesis, Literal: ")"},
+		{Type: token.LeftBrace, Literal: "{"},
+		{Type: token.Identifier, Literal: "x"},
+		{Type: token.Plus, Literal: "+"},
+		{Type: token.Identifier, Literal: "y"},
+		{Type: token.Semicolon, Literal: ";"},
+		{Type: token.RightBrace, Literal: "}"},
 
-		{token.Let, "let"},
-		{token.Identifier, "result"},
-		{token.Assign, "="},
-		{token.Identifier, "add"},
-		{token.LeftParenthesis, "("},
-		{token.Identifier, "five"},
-		{token.Comma, ","},
-		{token.Identifier, "ten"},
-		{token.RightParenthesis, ")"},
-		{token.Semicolon, ";"},
+		{Type: token.Let, Literal: "let"},
+		{Type: token.Identifier, Literal: "result"},
+		{Type: token.Assign, Literal: "="},
+		{Type: token.Identifier, Literal: "add"},
+		{Type: token.LeftParenthesis, Literal: "("},
+		{Type: token.Identifier, Literal: "five"},
+		{Type: token.Comma, Literal: ","},
+		{Type: token.Identifier, Literal: "ten"},
+		{Type: token.RightParenthesis, Literal: ")"},
+		{Type: token.Semicolon, Literal: ";"},
 	}
 
 	testLexer(t, input, tests)
@@ -91,20 +86,20 @@ func TestNextToken_ArithmeticAndLogicOperators(t *testing.T) {
 	5 < 10 > 5;
 	`
 
-	tests := []TokenTest{
-		{token.Bang, "!"},
-		{token.Minus, "-"},
-		{token.Asterisk, "*"},
-		{token.Slash, "/"},
-		{token.Integer, "5"},
-		{token.Semicolon, ";"},
+	tests := []token.Token{
+		{Type: token.Bang, Literal: "!"},
+		{Type: token.Minus, Literal: "-"},
+		{Type: token.Asterisk, Literal: "*"},
+		{Type: token.Slash, Literal: "/"},
+		{Type: token.Integer, Literal: "5"},
+		{Type: token.Semicolon, Literal: ";"},
 
-		{token.Integer, "5"},
-		{token.LessThan, "<"},
-		{token.Integer, "10"},
-		{token.GreaterThan, ">"},
-		{token.Integer, "5"},
-		{token.Semicolon, ";"},
+		{Type: token.Integer, Literal: "5"},
+		{Type: token.LessThan, Literal: "<"},
+		{Type: token.Integer, Literal: "10"},
+		{Type: token.GreaterThan, Literal: ">"},
+		{Type: token.Integer, Literal: "5"},
+		{Type: token.Semicolon, Literal: ";"},
 	}
 
 	testLexer(t, input, tests)
@@ -119,41 +114,61 @@ func TestNextToken_BranchingAndReturnKeywords(t *testing.T) {
 	}
 	`
 
-	tests := []TokenTest{
-		{token.If, "if"},
-		{token.LeftParenthesis, "("},
-		{token.Integer, "5"},
-		{token.LessThan, "<"},
-		{token.Integer, "10"},
-		{token.RightParenthesis, ")"},
-		{token.LeftBrace, "{"},
-		{token.Return, "return"},
-		{token.True, "true"},
-		{token.Semicolon, ";"},
-		{token.RightBrace, "}"},
-		{token.Else, "else"},
-		{token.LeftBrace, "{"},
-		{token.Return, "return"},
-		{token.False, "false"},
-		{token.Semicolon, ";"},
-		{token.RightBrace, "}"},
+	tests := []token.Token{
+		{Type: token.If, Literal: "if"},
+		{Type: token.LeftParenthesis, Literal: "("},
+		{Type: token.Integer, Literal: "5"},
+		{Type: token.LessThan, Literal: "<"},
+		{Type: token.Integer, Literal: "10"},
+		{Type: token.RightParenthesis, Literal: ")"},
+		{Type: token.LeftBrace, Literal: "{"},
+		{Type: token.Return, Literal: "return"},
+		{Type: token.True, Literal: "true"},
+		{Type: token.Semicolon, Literal: ";"},
+		{Type: token.RightBrace, Literal: "}"},
+		{Type: token.Else, Literal: "else"},
+		{Type: token.LeftBrace, Literal: "{"},
+		{Type: token.Return, Literal: "return"},
+		{Type: token.False, Literal: "false"},
+		{Type: token.Semicolon, Literal: ";"},
+		{Type: token.RightBrace, Literal: "}"},
 	}
 
 	testLexer(t, input, tests)
 }
 
-func testLexer(t *testing.T, input string, tests []TokenTest) {
+func TestNextToken_BooleanOperators(t *testing.T) {
+	input := `
+	10 == 10;
+	ten != 30;
+	`
+
+	tests := []token.Token{
+		{Type: token.Integer, Literal: "10"},
+		{Type: token.Equal, Literal: "=="},
+		{Type: token.Integer, Literal: "10"},
+		{Type: token.Semicolon, Literal: ";"},
+		{Type: token.Identifier, Literal: "ten"},
+		{Type: token.NotEqual, Literal: "!="},
+		{Type: token.Integer, Literal: "30"},
+		{Type: token.Semicolon, Literal: ";"},
+	}
+
+	testLexer(t, input, tests)
+}
+
+func testLexer(t *testing.T, input string, tests []token.Token) {
 	l := NewLexer(input)
 
 	for i, tt := range tests {
 		tok := l.NextToken()
 
-		if tok.Type != tt.expectedType {
-			t.Fatalf("tests[%d] - wrong token type. expected = %q, got = %q -> lexer = %#v", i, tt.expectedType, tok.Type, l)
+		if tok.Type != tt.Type {
+			t.Fatalf("tests[%d] - wrong token type. expected = %q, got = %q -> lexer = %#v", i, tt.Type, tok.Type, l)
 		}
 
-		if tok.Literal != tt.expectedLiteral {
-			t.Fatalf("tests[%d] - wrong literal. expected = %q, got = %q -> lexer = %#v", i, tt.expectedLiteral, tok.Literal, l)
+		if tok.Literal != tt.Literal {
+			t.Fatalf("tests[%d] - wrong literal. expected = %q, got = %q -> lexer = %#v", i, tt.Literal, tok.Literal, l)
 		}
 	}
 }

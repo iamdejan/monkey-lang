@@ -25,6 +25,8 @@ const (
 
 	LessThan    = "<"
 	GreaterThan = ">"
+	Equal       = "=="
+	NotEqual    = "!="
 
 	// delimiters
 	Comma     = ","
