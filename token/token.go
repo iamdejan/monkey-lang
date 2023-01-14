@@ -13,7 +13,7 @@ const (
 
 	// variable identifier and literal
 	Identifier = "Identifier"
-	Int        = "Int"
+	Integer    = "Integer"
 
 	// operators
 	Assign = "="
