@@ -1,7 +1,7 @@
 package token
 
 var keywords = map[string]TokenType{
-	"fn": Function,
+	"fn":  Function,
 	"let": Let,
 }
 

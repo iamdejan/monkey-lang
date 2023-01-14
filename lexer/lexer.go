@@ -9,7 +9,7 @@ type Lexer struct {
 	character    byte
 }
 
-func New(input string) *Lexer {
+func NewLexer(input string) *Lexer {
 	l := &Lexer{
 		input: input,
 	}
@@ -34,6 +34,8 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 
 	switch l.character {
+	case '!':
+		tok = newToken(token.Bang, l.character)
 	case '=':
 		tok = newToken(token.Assign, l.character)
 	case ';':
@@ -46,6 +48,16 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.Comma, l.character)
 	case '+':
 		tok = newToken(token.Plus, l.character)
+	case '-':
+		tok = newToken(token.Minus, l.character)
+	case '*':
+		tok = newToken(token.Asterisk, l.character)
+	case '/':
+		tok = newToken(token.Slash, l.character)
+	case '<':
+		tok = newToken(token.LessThan, l.character)
+	case '>':
+		tok = newToken(token.GreaterThan, l.character)
 	case '{':
 		tok = newToken(token.LeftBrace, l.character)
 	case '}':

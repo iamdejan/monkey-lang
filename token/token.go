@@ -16,8 +16,15 @@ const (
 	Integer    = "Integer"
 
 	// operators
-	Assign = "="
-	Plus   = "-"
+	Assign   = "="
+	Plus     = "+"
+	Minus    = "-"
+	Bang     = "!"
+	Asterisk = "*"
+	Slash    = "/"
+
+	LessThan    = "<"
+	GreaterThan = ">"
 
 	// delimiters
 	Comma     = ","
