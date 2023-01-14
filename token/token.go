@@ -38,4 +38,9 @@ const (
 	// keywords
 	Function = "Function"
 	Let      = "Let"
+	If       = "If"
+	Else     = "Else"
+	Return   = "Return"
+	True     = "True"
+	False    = "False"
 )

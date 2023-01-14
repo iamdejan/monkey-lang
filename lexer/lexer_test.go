@@ -110,6 +110,38 @@ func TestNextToken_ArithmeticAndLogicOperators(t *testing.T) {
 	testLexer(t, input, tests)
 }
 
+func TestNextToken_BranchingAndReturnKeywords(t *testing.T) {
+	input := `
+	if (5 < 10) {
+	    return true;
+	} else {
+	    return false;
+	}
+	`
+
+	tests := []TokenTest{
+		{token.If, "if"},
+		{token.LeftParenthesis, "("},
+		{token.Integer, "5"},
+		{token.LessThan, "<"},
+		{token.Integer, "10"},
+		{token.RightParenthesis, ")"},
+		{token.LeftBrace, "{"},
+		{token.Return, "return"},
+		{token.True, "true"},
+		{token.Semicolon, ";"},
+		{token.RightBrace, "}"},
+		{token.Else, "else"},
+		{token.LeftBrace, "{"},
+		{token.Return, "return"},
+		{token.False, "false"},
+		{token.Semicolon, ";"},
+		{token.RightBrace, "}"},
+	}
+
+	testLexer(t, input, tests)
+}
+
 func testLexer(t *testing.T, input string, tests []TokenTest) {
 	l := NewLexer(input)
 
@@ -117,11 +149,11 @@ func testLexer(t *testing.T, input string, tests []TokenTest) {
 		tok := l.NextToken()
 
 		if tok.Type != tt.expectedType {
-			t.Fatalf("tests[%d] - tokentype wrong. expected = %q, got = %q -> lexer = %#v", i, tt, tok, l)
+			t.Fatalf("tests[%d] - wrong token type. expected = %q, got = %q -> lexer = %#v", i, tt.expectedType, tok.Type, l)
 		}
 
 		if tok.Literal != tt.expectedLiteral {
-			t.Fatalf("tests[%d] - literal wrong. expected = %q, got = %q -> lexer = %#v", i, tt, tok, l)
+			t.Fatalf("tests[%d] - wrong literal. expected = %q, got = %q -> lexer = %#v", i, tt.expectedLiteral, tok.Literal, l)
 		}
 	}
 }
