@@ -40,7 +40,7 @@ func (l *Lexer) NextToken() token.Token {
 			l.readCharacter()
 			peek := l.character
 			tok = token.Token{
-				Type: token.NotEqual,
+				Type:    token.NotEqual,
 				Literal: string(ch) + string(peek),
 			}
 		} else {
@@ -52,7 +52,7 @@ func (l *Lexer) NextToken() token.Token {
 			l.readCharacter()
 			peek := l.character
 			tok = token.Token{
-				Type: token.Equal,
+				Type:    token.Equal,
 				Literal: string(ch) + string(peek),
 			}
 		} else {
