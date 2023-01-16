@@ -39,7 +39,7 @@ func (i *Identifier) TokenLiteral() string {
 }
 
 type LetStatement struct {
-	Token token.Token // TODO: check if needed or not, since this is always going to be 'let'?
+	Token token.Token
 	Name  *Identifier
 	Value Expression
 }
