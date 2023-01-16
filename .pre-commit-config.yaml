@@ -1,0 +1,7 @@
+- repo: local
+  hooks:
+    - id: go formatting
+      name: go formatting
+      language: system
+      entry: go fmt ./...
+      types: [go, file]
