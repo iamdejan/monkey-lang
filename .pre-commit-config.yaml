@@ -1,4 +1,4 @@
 - repo: https://github.com/tekwizely/pre-commit-golang
   rev: v1.0.0-rc.1
   hooks:
-    - id: go-fmt-repo
+    - id: go-fmt
