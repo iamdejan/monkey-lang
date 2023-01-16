@@ -1,0 +1,16 @@
+name: Test Monkey Language
+on:
+  push:
+
+jobs:
+  Main:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+      - name: Setup Go Language
+        uses: actions/setup-go@v3
+          with:
+            go-version: '^1.19.5'
+      - name: Test Go
+        run: 'go test ./... -count=1'
