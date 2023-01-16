@@ -5,3 +5,4 @@
       language: system
       entry: go fmt ./...
       types: [go, file]
+      pass_filenames: false
