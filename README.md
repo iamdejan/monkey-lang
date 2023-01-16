@@ -44,3 +44,10 @@ Follow the guide from [Go Language official website](https://go.dev/doc/install)
 You can install Python by downloading the setup from [here](https://www.python.org/downloads/windows/). Pip is also included in the setup.
 
 Reference: https://stackoverflow.com/a/12476379
+
+## Pre-Commit Hook
+
+Everytime you create / edit `.pre-commit-config.yaml` file, don't forget to run this command:
+```sh
+pre-commit install
+```
