@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestLetStatement(t *testing.T) {
+func TestLetStatements(t *testing.T) {
 	input := `
 	let x = 5;
 	let y = 1+2;
@@ -43,6 +43,29 @@ func TestLetStatement(t *testing.T) {
 	}
 }
 
+func TestLetStatements_InvalidIdentifiers(t *testing.T) {
+	input := `
+	let x 5;
+	let 1+2;
+	let = add(3, 4);
+	`
+
+	l := lexer.NewLexer(input)
+	p := NewParser(l)
+
+	program := p.ParseProgram()
+	if program == nil {
+		t.Fatal("`program` is null")
+	}
+
+	expectedErrors := []string{
+		"next token error. expected=`=`, actual=`Integer`",
+		"next token error. expected=`Identifier`, actual=`Integer`",
+		"next token error. expected=`Identifier`, actual=`=`",
+	}
+	validateParseErrors(t, p, expectedErrors)
+}
+
 func checkParseErrors(t *testing.T, p *Parser) {
 	errors := p.Errors()
 	length := len(errors)
@@ -53,6 +76,22 @@ func checkParseErrors(t *testing.T, p *Parser) {
 	t.Fatalf("parser has %d errors", length)
 	for _, msg := range errors {
 		t.Errorf("parser error: %s", msg)
+	}
+}
+
+func validateParseErrors(t *testing.T, p *Parser, expectedErrors []string) {
+	actualErrors := p.Errors()
+	length := len(actualErrors)
+	if length != len(expectedErrors) {
+		t.Fatalf("invalid parser errors. expected=`%d` errors, actual=`%d` errors", len(expectedErrors), length)
+		return
+	}
+
+	for i, err := range expectedErrors {
+		if actualErrors[i] != err {
+			t.Fatalf("invalid error message at %d. expected=`%s`, actual=`%s`", i, err, actualErrors[i])
+			return
+		}
 	}
 }
 
