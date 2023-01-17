@@ -1,8 +1,9 @@
-- repo: local
+repos:
+- repo: https://github.com/tekwizely/pre-commit-golang
+  rev: v1.0.0-rc.1
   hooks:
-    - id: go formatting
-      name: go formatting
-      language: system
-      entry: go fmt ./...
-      types: [go, file]
-      pass_filenames: false
+    - id: go-fmt
+      args: [-w]
+      verbose: true
+    - id: go-test-mod
+      verbose: true
