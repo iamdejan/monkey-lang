@@ -76,17 +76,17 @@ func correctLetStatement(t *testing.T, s ast.Statement, name string) bool {
 
 	letStmt, ok := s.(*ast.LetStatement)
 	if !ok {
-		t.Fatalf("statement is not `*ast.LetStatement`, but rather `%T`", s)
+		t.Errorf("statement is not `*ast.LetStatement`, but rather `%T`", s)
 		return false
 	}
 
 	if letStmt.Name.Value != name {
-		t.Fatalf("incorrect variable name. expected=`%s`, actual=`%s`", name, letStmt.Name.Value)
+		t.Errorf("incorrect variable name. expected=`%s`, actual=`%s`", name, letStmt.Name.Value)
 		return false
 	}
 
 	if letStmt.Name.TokenLiteral() != name {
-		t.Fatalf("incorrect letStmt.Name.TokenLiteral(). expected=`%s`, actual=`%s`", name, letStmt.Name.TokenLiteral())
+		t.Errorf("incorrect letStmt.Name.TokenLiteral(). expected=`%s`, actual=`%s`", name, letStmt.Name.TokenLiteral())
 		return false
 	}
 
