@@ -4,4 +4,6 @@ repos:
   hooks:
     - id: go-fmt
       args: [-w]
+      verbose: true
     - id: go-test-mod
+      verbose: true
