@@ -10,12 +10,12 @@ import (
 const (
 	_ int = iota
 	Lowest
-	Equals // e.g. 1 == a
+	Equals        // e.g. 1 == a
 	LessOrGreater // e.g. 2 < 3 or 3 > 1
-	Sum // e.g. 2 + 4
-	Product // e.g. 5 * 3
-	Prefix // e.g. --5
-	Call // e.g. add(2, 3)
+	Sum           // e.g. 2 + 4
+	Product       // e.g. 5 * 3
+	Prefix        // e.g. --5
+	Call          // e.g. add(2, 3)
 )
 
 type (
