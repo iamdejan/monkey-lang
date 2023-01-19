@@ -195,8 +195,43 @@ func TestIdentifierExpression(t *testing.T) {
 	}
 
 	if ident.TokenLiteral() != "foobar" {
-		t.Errorf("wrong ident.TokenLiteral(). expected=`foobar`, actual=`%s`", ident.Value)
+		t.Errorf("wrong ident.TokenLiteral(). expected=`foobar`, actual=`%s`", ident.TokenLiteral())
 	}
 }
 
 // end region identifier expression
+
+// region integer literal
+
+func TestIntegerLiteral(t *testing.T) {
+	input := `5;`
+
+	l := lexer.NewLexer(input)
+	p := NewParser(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. expected=`1` statement, actual=`%d` statement(s).", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not `*ast.ExpressionStatement`, but rather `%T`", program.Statements[0])
+	}
+
+	literal, ok := stmt.Expression.(*ast.IntegerLiteral)
+	if !ok {
+		t.Fatalf("stmt.Expression is not `*ast.IntegerLiteral`, but rather `%T`", stmt.Expression)
+	}
+
+	if literal.Value != 5 {
+		t.Errorf("wrong literal.Value. expected=`5`, actual=`%d`", literal.Value)
+	}
+
+	if literal.TokenLiteral() != "5" {
+		t.Errorf("wrong literal.TokenLiteral(). expected=`5`, actual=`%s`", literal.TokenLiteral())
+	}
+}
+
+// end region integer literal
