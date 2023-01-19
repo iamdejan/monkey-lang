@@ -49,5 +49,7 @@ Reference: https://stackoverflow.com/a/12476379
 
 Everytime you create / edit `.pre-commit-config.yaml` file, don't forget to run this command:
 ```sh
-pre-commit install
+pre-commit install --hook-type pre-push
 ```
+
+NOTE: to ease the life of the developer, we need to add a little bit of leniency for the validation, which is why the validation is done before push, not before commit. The commit will be squashed anyway, so it's okay to validate before push.
