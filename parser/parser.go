@@ -79,7 +79,7 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 
 func (p *Parser) parsePrefixExpression() ast.Expression {
 	expression := &ast.PrefixExpression{
-		Token: p.current,
+		Token:    p.current,
 		Operator: p.current.Literal,
 	}
 
