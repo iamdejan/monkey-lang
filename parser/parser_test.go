@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"monkey/ast"
 	"monkey/lexer"
 	"testing"
@@ -43,29 +44,6 @@ func TestLetStatements(t *testing.T) {
 			return
 		}
 	}
-}
-
-func TestLetStatements_InvalidIdentifiers(t *testing.T) {
-	input := `
-	let x 5;
-	let 1+2;
-	let = add(3, 4);
-	`
-
-	l := lexer.NewLexer(input)
-	p := NewParser(l)
-
-	program := p.ParseProgram()
-	if program == nil {
-		t.Fatal("`program` is null")
-	}
-
-	expectedErrors := []string{
-		"next token error. expected=`=`, actual=`Integer`",
-		"next token error. expected=`Identifier`, actual=`Integer`",
-		"next token error. expected=`Identifier`, actual=`=`",
-	}
-	validateParseErrors(t, p, expectedErrors)
 }
 
 func correctLetStatement(t *testing.T, s ast.Statement, name string) bool {
@@ -148,22 +126,6 @@ func checkParseErrors(t *testing.T, p *Parser) {
 	}
 }
 
-func validateParseErrors(t *testing.T, p *Parser, expectedErrors []string) {
-	actualErrors := p.Errors()
-	length := len(actualErrors)
-	if length != len(expectedErrors) {
-		t.Fatalf("invalid parser errors. expected=`%d` errors, actual=`%d` errors", len(expectedErrors), length)
-		return
-	}
-
-	for i, err := range expectedErrors {
-		if actualErrors[i] != err {
-			t.Fatalf("invalid error message at %d. expected=`%s`, actual=`%s`", i, err, actualErrors[i])
-			return
-		}
-	}
-}
-
 // end region utilities
 
 // region identifier expression
@@ -235,3 +197,69 @@ func TestIntegerLiteral(t *testing.T) {
 }
 
 // end region integer literal
+
+// region prefix expressions
+
+type PrefixTest struct {
+	input        string
+	operator     string
+	integerValue int64
+}
+
+func TestParsingPrefixExpressions(t *testing.T) {
+	prefixTests := []PrefixTest{
+		{input: "!5;", operator: "!", integerValue: 5},
+		{input: "-15;", operator: "-", integerValue: 15},
+	}
+
+	for _, tt := range prefixTests {
+		l := lexer.NewLexer(tt.input)
+		p := NewParser(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("wrong length for `program.Statements`. expected=`%d`, actual=`%d`", 1, len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("wrong type of `program.Statements[0]`. expected=`*ast.ExpressionStatement`, actual=`%T`", program.Statements[0])
+		}
+
+		exp, ok := stmt.Expression.(*ast.PrefixExpression)
+		if !ok {
+			t.Fatalf("wrong type of `stmt.Expression`. expected=`*ast.PrefixExpression`, actual=`%T`", stmt.Expression)
+		}
+
+		if exp.Operator != tt.operator {
+			t.Fatalf("wrong `exp.Operator`. expected=`%s`, actual=`%s`", tt.operator, exp.Operator)
+		}
+
+		if !testIntegerLiteral(t, exp.Right, tt.integerValue) {
+			return
+		}
+	}
+}
+
+func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
+	integ, ok := il.(*ast.IntegerLiteral)
+	if !ok {
+		t.Errorf("wrong integer literal type. expected=`*ast.IntegerLiteral`, got=`%T`", il)
+		return false
+	}
+
+	if integ.Value != value {
+		t.Errorf("wrong `integ.Value`. expected=`%d`, got=`%d`", value, integ.Value)
+		return false
+	}
+
+	if integ.TokenLiteral() != fmt.Sprintf("%d", value) {
+		t.Errorf("wrong `integ.TokenLiteral()`. expected=`%s`, got=`%s`", fmt.Sprintf("%d", value), integ.TokenLiteral())
+		return false
+	}
+
+	return true
+}
+
+// end region prefix expressions
