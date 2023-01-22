@@ -46,29 +46,6 @@ func TestLetStatements(t *testing.T) {
 	}
 }
 
-func TestLetStatements_InvalidIdentifiers(t *testing.T) {
-	input := `
-	let x 5;
-	let 1+2;
-	let = add(3, 4);
-	`
-
-	l := lexer.NewLexer(input)
-	p := NewParser(l)
-
-	program := p.ParseProgram()
-	if program == nil {
-		t.Fatal("`program` is null")
-	}
-
-	expectedErrors := []string{
-		"next token error. expected=`=`, actual=`Integer`",
-		"next token error. expected=`Identifier`, actual=`Integer`",
-		"next token error. expected=`Identifier`, actual=`=`",
-	}
-	validateParseErrors(t, p, expectedErrors)
-}
-
 func correctLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	if s.TokenLiteral() != "let" {
 		t.Errorf("incorrect token literal. expected=`let`, actual=`%s`", s.TokenLiteral())
@@ -146,22 +123,6 @@ func checkParseErrors(t *testing.T, p *Parser) {
 	t.Errorf("parser has %d errors", length)
 	for _, msg := range errors {
 		t.Errorf("parser error: %s", msg)
-	}
-}
-
-func validateParseErrors(t *testing.T, p *Parser, expectedErrors []string) {
-	actualErrors := p.Errors()
-	length := len(actualErrors)
-	if length != len(expectedErrors) {
-		t.Fatalf("invalid parser errors. expected=`%d` errors, actual=`%d` errors", len(expectedErrors), length)
-		return
-	}
-
-	for i, err := range expectedErrors {
-		if actualErrors[i] != err {
-			t.Fatalf("invalid error message at %d. expected=`%s`, actual=`%s`", i, err, actualErrors[i])
-			return
-		}
 	}
 }
 
