@@ -156,11 +156,12 @@ func (pe *PrefixExpression) String() string {
 }
 
 type InfixExpression struct {
-	Token token.Token // infix operator's token, e.g. +
-	Left Expression
+	Token    token.Token // infix operator's token, e.g. +
+	Left     Expression
 	Operator string
-	Right Expression
+	Right    Expression
 }
+
 func (ie *InfixExpression) expressionNode() {}
 func (ie *InfixExpression) TokenLiteral() string {
 	return ie.Token.Literal
