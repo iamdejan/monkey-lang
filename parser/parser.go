@@ -11,13 +11,24 @@ import (
 const (
 	_ int = iota
 	Lowest
-	Equals        // e.g. 1 == a
+	Equal         // e.g. 1 == a
 	LessOrGreater // e.g. 2 < 3 or 3 > 1
 	Sum           // e.g. 2 + 4
 	Product       // e.g. 5 * 3
 	Prefix        // e.g. -5
 	Call          // e.g. add(2, 3)
 )
+
+var precedences = map[token.TokenType]int{
+	token.Equal:       Equal,
+	token.NotEqual:    Equal,
+	token.LessThan:    LessOrGreater,
+	token.GreaterThan: LessOrGreater,
+	token.Plus:        Sum,
+	token.Minus:       Sum,
+	token.Slash:       Product,
+	token.Asterisk:    Product,
+}
 
 type (
 	prefixParseFn func() ast.Expression
@@ -46,6 +57,16 @@ func NewParser(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.Integer, p.parseIntegerLiteral)
 	p.registerPrefix(token.Bang, p.parsePrefixExpression)
 	p.registerPrefix(token.Minus, p.parsePrefixExpression)
+
+	p.infixParseFns = make(map[token.TokenType]infixParseFn)
+	p.registerInfix(token.Plus, p.parseInfixExpression)
+	p.registerInfix(token.Minus, p.parseInfixExpression)
+	p.registerInfix(token.Slash, p.parseInfixExpression)
+	p.registerInfix(token.Asterisk, p.parseInfixExpression)
+	p.registerInfix(token.Equal, p.parseInfixExpression)
+	p.registerInfix(token.NotEqual, p.parseInfixExpression)
+	p.registerInfix(token.LessThan, p.parseInfixExpression)
+	p.registerInfix(token.GreaterThan, p.parseInfixExpression)
 
 	p.nextToken()
 	p.nextToken()
@@ -197,12 +218,18 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 	leftExp := prefix()
 
-	return leftExp
-}
+	for p.peek.Type != token.Semicolon && precedence < p.peekPrecedence() {
+		infix := p.infixParseFns[p.peek.Type]
+		if infix == nil {
+			return leftExp
+		}
 
-func (p *Parser) peekError(expected token.TokenType) {
-	msg := fmt.Sprintf("next token error. expected=`%s`, actual=`%s`", expected, p.peek.Type)
-	p.errors = append(p.errors, msg)
+		p.nextToken()
+
+		leftExp = infix(leftExp)
+	}
+
+	return leftExp
 }
 
 func (p *Parser) expectPeek(t token.TokenType) bool {
@@ -215,7 +242,46 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 	return false
 }
 
+func (p *Parser) peekPrecedence() int {
+	if p, ok := precedences[p.peek.Type]; ok {
+		return p
+	}
+
+	return Lowest
+}
+
+func (p *Parser) currentPrecedence() int {
+	if p, ok := precedences[p.current.Type]; ok {
+		return p
+	}
+
+	return Lowest
+}
+
+func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
+	expression := &ast.InfixExpression{
+		Token:    p.current,
+		Left:     left,
+		Operator: p.current.Literal,
+	}
+
+	precedence := p.currentPrecedence()
+	p.nextToken()
+	expression.Right = p.parseExpression(precedence)
+
+	return expression
+}
+
+// region error helper functions
+
+func (p *Parser) peekError(expected token.TokenType) {
+	msg := fmt.Sprintf("next token error. expected=`%s`, actual=`%s`", expected, p.peek.Type)
+	p.errors = append(p.errors, msg)
+}
+
 func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 	msg := fmt.Sprintf("no prefix parse function for %s found", t)
 	p.errors = append(p.errors, msg)
 }
+
+// end region error helper functions

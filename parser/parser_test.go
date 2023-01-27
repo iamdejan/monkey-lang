@@ -267,9 +267,9 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 // region infix expressions
 
 type InfixExpressionTest struct {
-	input string
-	leftValue int64
-	operator string
+	input      string
+	leftValue  int64
+	operator   string
 	rightValue int64
 }
 
@@ -316,6 +316,35 @@ func TestParsingInfixExpressions(t *testing.T) {
 
 		if !testIntegerLiteral(t, exp.Right, tt.rightValue) {
 			return
+		}
+	}
+}
+
+type OperatorPrecedenceTest struct {
+	input    string
+	expected string
+}
+
+func TestOperatorPrecedence(t *testing.T) {
+	tests := []OperatorPrecedenceTest{
+		{input: "1 + 2 + 3", expected: "((1 + 2) + 3)"},
+		{input: "1 * 2 + 3", expected: "((1 * 2) + 3)"},
+		{input: "1 + 2 / 3", expected: "(1 + (2 / 3))"},
+		{input: "-a * b", expected: "((-a) * b)"},
+		{input: "!-a", expected: "(!(-a))"},
+		{input: "a * b / c + d", expected: "(((a * b) / c) + d)"},
+		{input: "3 + 4 * 5 == 3 * 1 + 4 * 5", expected: "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+	}
+
+	for _, tt := range tests {
+		l := lexer.NewLexer(tt.input)
+		p := NewParser(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
+
+		actual := program.String()
+		if actual != tt.expected {
+			t.Fatalf("wrong evaluation. expected=`%s`, actual=`%s`", tt.expected, actual)
 		}
 	}
 }
