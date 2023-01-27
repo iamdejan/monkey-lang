@@ -263,3 +263,90 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 }
 
 // end region prefix expressions
+
+// region infix expressions
+
+type InfixExpressionTest struct {
+	input      string
+	leftValue  int64
+	operator   string
+	rightValue int64
+}
+
+func TestParsingInfixExpressions(t *testing.T) {
+	tests := []InfixExpressionTest{
+		{input: "5 + 5", leftValue: 5, operator: "+", rightValue: 5},
+		{input: "1 + 2", leftValue: 1, operator: "+", rightValue: 2},
+		{input: "5 - 5", leftValue: 5, operator: "-", rightValue: 5},
+		{input: "5 * 5", leftValue: 5, operator: "*", rightValue: 5},
+		{input: "5 / 5", leftValue: 5, operator: "/", rightValue: 5},
+		{input: "5 == 5", leftValue: 5, operator: "==", rightValue: 5},
+		{input: "5 != 5", leftValue: 5, operator: "!=", rightValue: 5},
+		{input: "5 < 5", leftValue: 5, operator: "<", rightValue: 5},
+		{input: "5 > 5", leftValue: 5, operator: ">", rightValue: 5},
+	}
+
+	for _, tt := range tests {
+		l := lexer.NewLexer(tt.input)
+		p := NewParser(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("wrong program.Statements length. expected=`1`, actual=`%d`", len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("wrong type for program.Statements[0]. expected=`*ast.ExpressionStatement`, actual=`%T`", program.Statements[0])
+		}
+
+		exp, ok := stmt.Expression.(*ast.InfixExpression)
+		if !ok {
+			t.Fatalf("wrong type for stmt.Expression. expected=`*ast.InfixExpression`, actual=`%T`", stmt.Expression)
+		}
+
+		if !testIntegerLiteral(t, exp.Left, tt.leftValue) {
+			return
+		}
+
+		if exp.Operator != tt.operator {
+			t.Fatalf("wrong exp.Operator. expected=`%s`, actual=`%s`", tt.operator, exp.Operator)
+		}
+
+		if !testIntegerLiteral(t, exp.Right, tt.rightValue) {
+			return
+		}
+	}
+}
+
+type OperatorPrecedenceTest struct {
+	input    string
+	expected string
+}
+
+func TestOperatorPrecedence(t *testing.T) {
+	tests := []OperatorPrecedenceTest{
+		{input: "1 + 2 + 3", expected: "((1 + 2) + 3)"},
+		{input: "1 * 2 + 3", expected: "((1 * 2) + 3)"},
+		{input: "1 + 2 / 3", expected: "(1 + (2 / 3))"},
+		{input: "-a * b", expected: "((-a) * b)"},
+		{input: "!-a", expected: "(!(-a))"},
+		{input: "a * b / c + d", expected: "(((a * b) / c) + d)"},
+		{input: "3 + 4 * 5 == 3 * 1 + 4 * 5", expected: "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+	}
+
+	for _, tt := range tests {
+		l := lexer.NewLexer(tt.input)
+		p := NewParser(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
+
+		actual := program.String()
+		if actual != tt.expected {
+			t.Fatalf("wrong evaluation. expected=`%s`, actual=`%s`", tt.expected, actual)
+		}
+	}
+}
+
+// end region infix expressions
