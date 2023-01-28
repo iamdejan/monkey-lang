@@ -147,18 +147,7 @@ func TestIdentifierExpression(t *testing.T) {
 		t.Fatalf("program.Statements[0] is not `*ast.ExpressionStatement`, but rather `%T`", program.Statements[0])
 	}
 
-	ident, ok := stmt.Expression.(*ast.Identifier)
-	if !ok {
-		t.Fatalf("stmt.Expression is not `*ast.Identifier`, but rather `%T`", stmt.Expression)
-	}
-
-	if ident.Value != "foobar" {
-		t.Errorf("wrong ident.Value. expected=`foobar`, actual=`%s`", ident.Value)
-	}
-
-	if ident.TokenLiteral() != "foobar" {
-		t.Errorf("wrong ident.TokenLiteral(). expected=`foobar`, actual=`%s`", ident.TokenLiteral())
-	}
+	testLiteralExpression(t, stmt.Expression, "foobar")
 }
 
 // end region identifier expression
@@ -182,18 +171,7 @@ func TestIntegerLiteral(t *testing.T) {
 		t.Fatalf("program.Statements[0] is not `*ast.ExpressionStatement`, but rather `%T`", program.Statements[0])
 	}
 
-	literal, ok := stmt.Expression.(*ast.IntegerLiteral)
-	if !ok {
-		t.Fatalf("stmt.Expression is not `*ast.IntegerLiteral`, but rather `%T`", stmt.Expression)
-	}
-
-	if literal.Value != 5 {
-		t.Errorf("wrong literal.Value. expected=`5`, actual=`%d`", literal.Value)
-	}
-
-	if literal.TokenLiteral() != "5" {
-		t.Errorf("wrong literal.TokenLiteral(). expected=`5`, actual=`%s`", literal.TokenLiteral())
-	}
+	testLiteralExpression(t, stmt.Expression, 5)
 }
 
 // end region integer literal
@@ -242,26 +220,6 @@ func TestParsingPrefixExpressions(t *testing.T) {
 	}
 }
 
-func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
-	integ, ok := il.(*ast.IntegerLiteral)
-	if !ok {
-		t.Errorf("wrong integer literal type. expected=`*ast.IntegerLiteral`, got=`%T`", il)
-		return false
-	}
-
-	if integ.Value != value {
-		t.Errorf("wrong `integ.Value`. expected=`%d`, got=`%d`", value, integ.Value)
-		return false
-	}
-
-	if integ.TokenLiteral() != fmt.Sprintf("%d", value) {
-		t.Errorf("wrong `integ.TokenLiteral()`. expected=`%s`, got=`%s`", fmt.Sprintf("%d", value), integ.TokenLiteral())
-		return false
-	}
-
-	return true
-}
-
 // end region prefix expressions
 
 // region infix expressions
@@ -306,17 +264,7 @@ func TestParsingInfixExpressions(t *testing.T) {
 			t.Fatalf("wrong type for stmt.Expression. expected=`*ast.InfixExpression`, actual=`%T`", stmt.Expression)
 		}
 
-		if !testIntegerLiteral(t, exp.Left, tt.leftValue) {
-			return
-		}
-
-		if exp.Operator != tt.operator {
-			t.Fatalf("wrong exp.Operator. expected=`%s`, actual=`%s`", tt.operator, exp.Operator)
-		}
-
-		if !testIntegerLiteral(t, exp.Right, tt.rightValue) {
-			return
-		}
+		testInfixExpression(t, exp, tt.leftValue, tt.operator, tt.rightValue)
 	}
 }
 
@@ -350,3 +298,82 @@ func TestOperatorPrecedence(t *testing.T) {
 }
 
 // end region infix expressions
+
+// region test helper functions
+
+func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
+	integ, ok := il.(*ast.IntegerLiteral)
+	if !ok {
+		t.Errorf("wrong integer literal type. expected=`*ast.IntegerLiteral`, got=`%T`", il)
+		return false
+	}
+
+	if integ.Value != value {
+		t.Errorf("wrong `integ.Value`. expected=`%d`, got=`%d`", value, integ.Value)
+		return false
+	}
+
+	if integ.TokenLiteral() != fmt.Sprintf("%d", value) {
+		t.Errorf("wrong `integ.TokenLiteral()`. expected=`%s`, got=`%s`", fmt.Sprintf("%d", value), integ.TokenLiteral())
+		return false
+	}
+
+	return true
+}
+
+func testIdentifier(t *testing.T, exp ast.Expression, value string) bool {
+	ident, ok := exp.(*ast.Identifier)
+	if !ok {
+		t.Errorf("wrong exp type. expected=`*ast.Identifier`, actual=`%T`", exp)
+		return false
+	}
+
+	if ident.Value != value {
+		t.Errorf("wrong ident.Value. expected=`%s`, actual=`%s`", value, ident.Value)
+		return false
+	}
+
+	if ident.TokenLiteral() != value {
+		t.Errorf("wrong ident.TokenLiteral(). expected=`%s`, actual=%s", value, ident.TokenLiteral())
+	}
+
+	return true
+}
+
+func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{}) bool {
+	switch v := expected.(type) {
+	case int:
+		return testIntegerLiteral(t, exp, int64(v))
+	case int64:
+		return testIntegerLiteral(t, exp, v)
+	case string:
+		return testIdentifier(t, exp, v)
+	}
+	t.Fatalf("type of exp not handled. actual=`%T`", exp)
+	return false
+}
+
+func testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, operator string, right interface{}) bool {
+	opExp, ok := exp.(*ast.InfixExpression)
+	if !ok {
+		t.Errorf("wrong exp type. expected=`*ast.InfixExpression`, actual=`%T(%s)`", exp, exp)
+		return false
+	}
+
+	if !testLiteralExpression(t, opExp.Left, left) {
+		return false
+	}
+
+	if opExp.Operator != operator {
+		t.Errorf("wrong opExp.Operator. expected=`%s`, actual=`%s`", operator, opExp.Operator)
+		return false
+	}
+
+	if !testLiteralExpression(t, opExp.Right, right) {
+		return false
+	}
+
+	return true
+}
+
+// end region test helper functions
