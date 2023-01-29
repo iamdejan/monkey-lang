@@ -162,15 +162,17 @@ func TestIntegerLiteral(t *testing.T) {
 // region prefix expressions
 
 type PrefixTest struct {
-	input        string
-	operator     string
-	integerValue int64
+	input    string
+	operator string
+	value    interface{}
 }
 
 func TestParsingPrefixExpressions(t *testing.T) {
 	prefixTests := []PrefixTest{
-		{input: "!5;", operator: "!", integerValue: 5},
-		{input: "-15;", operator: "-", integerValue: 15},
+		{input: "!5;", operator: "!", value: 5},
+		{input: "-15;", operator: "-", value: 15},
+		{input: "!true;", operator: "!", value: true},
+		{input: "!false;", operator: "!", value: false},
 	}
 
 	for _, tt := range prefixTests {
@@ -197,7 +199,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 			t.Fatalf("wrong `exp.Operator`. expected=`%s`, actual=`%s`", tt.operator, exp.Operator)
 		}
 
-		if !testIntegerLiteral(t, exp.Right, tt.integerValue) {
+		if !testLiteralExpression(t, exp.Right, tt.value) {
 			return
 		}
 	}
