@@ -261,7 +261,7 @@ type OperatorPrecedenceTest struct {
 	expected string
 }
 
-func TestOperatorPrecedence(t *testing.T) {
+func TestOperatorPrecedenceParsing(t *testing.T) {
 	tests := []OperatorPrecedenceTest{
 		{input: "1 + 2 + 3", expected: "((1 + 2) + 3)"},
 		{input: "1 * 2 + 3", expected: "((1 * 2) + 3)"},
@@ -274,6 +274,11 @@ func TestOperatorPrecedence(t *testing.T) {
 		{input: "false", expected: "false"},
 		{input: "3 > 5 == false", expected: "((3 > 5) == false)"},
 		{input: "3 < 5 == true", expected: "((3 < 5) == true)"},
+		{input: "1 + (2 + 3) + 4", expected: "((1 + (2 + 3)) + 4)"},
+		{input: "(5 + 5) * 2", expected: "((5 + 5) * 2)"},
+		{input: "2 / (5 + 5)", expected: "(2 / (5 + 5))"},
+		{input: "-(5 + 5)", expected: "(-(5 + 5))"},
+		{input: "!(true == true)", expected: "(!(true == true))"},
 	}
 
 	for _, tt := range tests {
