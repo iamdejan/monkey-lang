@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"monkey/ast"
 	"monkey/lexer"
 	"testing"
@@ -320,117 +319,107 @@ func TestBooleanLiteral(t *testing.T) {
 
 // end region boolean expressions
 
-// region test helper functions
+// region if expressions
 
-func checkParseErrors(t *testing.T, p *Parser) {
-	errors := p.Errors()
-	length := len(errors)
-	if length == 0 {
+func TestIfExpression(t *testing.T) {
+	input := "if (x < y) { x }"
+
+	l := lexer.NewLexer(input)
+	p := NewParser(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. expected=`1` statement, actual=`%d` statement(s).", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not `*ast.ExpressionStatement`, but rather `%T`", program.Statements[0])
+	}
+
+	exp, ok := stmt.Expression.(*ast.IfExpression)
+	if !ok {
+		t.Fatalf("wrong type for stmt.Expression. exptected=`*ast.IfExpression`, actual=`%T`", stmt.Expression)
+	}
+
+	if !testInfixExpression(t, exp.Condition, "x", "<", "y") {
 		return
 	}
 
-	t.Errorf("parser has %d errors", length)
-	for _, msg := range errors {
-		t.Errorf("parser error: %s", msg)
+	if len(exp.Consequence.Statements) != 1 {
+		t.Fatalf("wrong length for exp.Consequence.Statements. expected=`1`, actual=`%d`", len(exp.Consequence.Statements))
 	}
-	t.FailNow()
-}
 
-func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{}) bool {
-	switch v := expected.(type) {
-	case bool:
-		return testBooleanLiteral(t, exp, bool(v))
-	case int:
-		return testIntegerLiteral(t, exp, int64(v))
-	case int64:
-		return testIntegerLiteral(t, exp, v)
-	case string:
-		return testIdentifier(t, exp, v)
-	}
-	t.Fatalf("type of exp not handled. actual=`%T`", exp)
-	return false
-}
-
-func testBooleanLiteral(t *testing.T, bl ast.Expression, value bool) bool {
-	b, ok := bl.(*ast.BooleanLiteral)
+	consequence, ok := exp.Consequence.Statements[0].(*ast.ExpressionStatement)
 	if !ok {
-		t.Errorf("wrong boolean literal type. expected=`*ast.BooleanLiteral`, got=`%T`", bl)
-		return false
+		t.Fatalf("wrong type for exp.Consequence.Statements[0]. expected=`*ast.ExpressionStatement`, actual=`%T`", exp.Consequence.Statements[0])
 	}
 
-	if b.Value != value {
-		t.Errorf("wrong `b.Value`. expected=`%v`, got=`%v`", value, b.Value)
-		return false
+	if !testIdentifier(t, consequence.Expression, "x") {
+		return
 	}
 
-	if b.TokenLiteral() != fmt.Sprintf("%v", value) {
-		t.Errorf("wrong `b.TokenLiteral()`. expected=`%s`, got=`%s`", fmt.Sprintf("%v", value), b.TokenLiteral())
-		return false
+	if exp.Alternative != nil {
+		t.Fatalf("exp.Alternative should be null, but instead got `%#v`", exp.Alternative)
 	}
-
-	return true
 }
 
-func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
-	integ, ok := il.(*ast.IntegerLiteral)
+func TestIfElseExpression(t *testing.T) {
+	input := "if (x < y) { x } else { y }"
+
+	l := lexer.NewLexer(input)
+	p := NewParser(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. expected=`1` statement, actual=`%d` statement(s).", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
 	if !ok {
-		t.Errorf("wrong integer literal type. expected=`*ast.IntegerLiteral`, got=`%T`", il)
-		return false
+		t.Fatalf("program.Statements[0] is not `*ast.ExpressionStatement`, but rather `%T`", program.Statements[0])
 	}
 
-	if integ.Value != value {
-		t.Errorf("wrong `integ.Value`. expected=`%d`, got=`%d`", value, integ.Value)
-		return false
-	}
-
-	if integ.TokenLiteral() != fmt.Sprintf("%d", value) {
-		t.Errorf("wrong `integ.TokenLiteral()`. expected=`%s`, got=`%s`", fmt.Sprintf("%d", value), integ.TokenLiteral())
-		return false
-	}
-
-	return true
-}
-
-func testIdentifier(t *testing.T, exp ast.Expression, value string) bool {
-	ident, ok := exp.(*ast.Identifier)
+	exp, ok := stmt.Expression.(*ast.IfExpression)
 	if !ok {
-		t.Errorf("wrong exp type. expected=`*ast.Identifier`, actual=`%T`", exp)
-		return false
+		t.Fatalf("wrong type for stmt.Expression. exptected=`*ast.IfExpression`, actual=`%T`", stmt.Expression)
 	}
 
-	if ident.Value != value {
-		t.Errorf("wrong ident.Value. expected=`%s`, actual=`%s`", value, ident.Value)
-		return false
+	if !testInfixExpression(t, exp.Condition, "x", "<", "y") {
+		return
 	}
 
-	if ident.TokenLiteral() != value {
-		t.Errorf("wrong ident.TokenLiteral(). expected=`%s`, actual=%s", value, ident.TokenLiteral())
+	if len(exp.Consequence.Statements) != 1 {
+		t.Fatalf("wrong length for exp.Consequence.Statements. expected=`1`, actual=`%d`", len(exp.Consequence.Statements))
 	}
 
-	return true
-}
-
-func testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, operator string, right interface{}) bool {
-	opExp, ok := exp.(*ast.InfixExpression)
+	consequence, ok := exp.Consequence.Statements[0].(*ast.ExpressionStatement)
 	if !ok {
-		t.Errorf("wrong exp type. expected=`*ast.InfixExpression`, actual=`%T(%s)`", exp, exp)
-		return false
+		t.Fatalf("wrong type for exp.Consequence.Statements[0]. expected=`*ast.ExpressionStatement`, actual=`%T`", exp.Consequence.Statements[0])
 	}
 
-	if !testLiteralExpression(t, opExp.Left, left) {
-		return false
+	if !testIdentifier(t, consequence.Expression, "x") {
+		return
 	}
 
-	if opExp.Operator != operator {
-		t.Errorf("wrong opExp.Operator. expected=`%s`, actual=`%s`", operator, opExp.Operator)
-		return false
+	if exp.Alternative == nil {
+		t.Fatalf("exp.Alternative should not be null")
 	}
 
-	if !testLiteralExpression(t, opExp.Right, right) {
-		return false
+	if len(exp.Alternative.Statements) != 1 {
+		t.Fatalf("wrong length for exp.Alternative.Statements. expected=`1`, actual=`%d`", len(exp.Consequence.Statements))
 	}
 
-	return true
+	alternative, ok := exp.Alternative.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("wrong type for exp.Alternative.Statements[0]. expected=`*ast.ExpressionStatement`, actual=`%T`", exp.Consequence.Statements[0])
+	}
+
+	if !testIdentifier(t, alternative.Expression, "y") {
+		return
+	}
 }
 
-// end region test helper functions
+// end region if expressions

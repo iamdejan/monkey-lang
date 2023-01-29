@@ -60,6 +60,7 @@ func NewParser(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.True, p.parseBoolean)
 	p.registerPrefix(token.False, p.parseBoolean)
 	p.registerPrefix(token.LeftParenthesis, p.parseGroupedExpression)
+	p.registerPrefix(token.If, p.parseIfExpression)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.Plus, p.parseInfixExpression)
@@ -294,16 +295,57 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 	return exp
 }
 
-// region error helper functions
+func (p *Parser) parseIfExpression() ast.Expression {
+	exp := &ast.IfExpression{
+		Token: p.current,
+	}
 
-func (p *Parser) peekError(expected token.TokenType) {
-	msg := fmt.Sprintf("next token error. expected=`%s`, actual=`%s`", expected, p.peek.Type)
-	p.errors = append(p.errors, msg)
+	if !p.expectPeek(token.LeftParenthesis) {
+		return nil
+	}
+
+	p.nextToken()
+
+	exp.Condition = p.parseExpression(Lowest)
+
+	if !p.expectPeek(token.RightParenthesis) {
+		return nil
+	}
+
+	if !p.expectPeek(token.LeftBrace) {
+		return nil
+	}
+
+	exp.Consequence = p.parseBlockStatement()
+
+	// `else` (alternative) block handling
+	if p.peek.Type == token.Else {
+		p.nextToken()
+
+		if !p.expectPeek(token.LeftBrace) {
+			return nil
+		}
+
+		exp.Alternative = p.parseBlockStatement()
+	}
+
+	return exp
 }
 
-func (p *Parser) noPrefixParseFnError(t token.TokenType) {
-	msg := fmt.Sprintf("no prefix parse function for %s found", t)
-	p.errors = append(p.errors, msg)
-}
+func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+	block := &ast.BlockStatement{
+		Token: p.current,
+	}
+	block.Statements = []ast.Statement{}
 
-// end region error helper functions
+	p.nextToken()
+
+	for p.current.Type != token.RightBrace && p.current.Type != token.Eof {
+		stmt := p.parseStatement()
+		if stmt != nil {
+			block.Statements = append(block.Statements, stmt)
+		}
+		p.nextToken()
+	}
+	return block
+}
