@@ -59,6 +59,7 @@ func NewParser(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.Minus, p.parsePrefixExpression)
 	p.registerPrefix(token.True, p.parseBoolean)
 	p.registerPrefix(token.False, p.parseBoolean)
+	p.registerPrefix(token.LeftParenthesis, p.parseGroupedExpression)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.Plus, p.parseInfixExpression)
@@ -279,6 +280,18 @@ func (p *Parser) parseBoolean() ast.Expression {
 		Token: p.current,
 		Value: (p.current.Type == token.True),
 	}
+}
+
+func (p *Parser) parseGroupedExpression() ast.Expression {
+	p.nextToken()
+
+	exp := p.parseExpression(Lowest)
+
+	if !p.expectPeek(token.RightParenthesis) {
+		return nil
+	}
+
+	return exp
 }
 
 // region error helper functions

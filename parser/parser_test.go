@@ -162,15 +162,17 @@ func TestIntegerLiteral(t *testing.T) {
 // region prefix expressions
 
 type PrefixTest struct {
-	input        string
-	operator     string
-	integerValue int64
+	input    string
+	operator string
+	value    interface{}
 }
 
 func TestParsingPrefixExpressions(t *testing.T) {
 	prefixTests := []PrefixTest{
-		{input: "!5;", operator: "!", integerValue: 5},
-		{input: "-15;", operator: "-", integerValue: 15},
+		{input: "!5;", operator: "!", value: 5},
+		{input: "-15;", operator: "-", value: 15},
+		{input: "!true;", operator: "!", value: true},
+		{input: "!false;", operator: "!", value: false},
 	}
 
 	for _, tt := range prefixTests {
@@ -197,7 +199,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 			t.Fatalf("wrong `exp.Operator`. expected=`%s`, actual=`%s`", tt.operator, exp.Operator)
 		}
 
-		if !testIntegerLiteral(t, exp.Right, tt.integerValue) {
+		if !testLiteralExpression(t, exp.Right, tt.value) {
 			return
 		}
 	}
@@ -259,7 +261,7 @@ type OperatorPrecedenceTest struct {
 	expected string
 }
 
-func TestOperatorPrecedence(t *testing.T) {
+func TestOperatorPrecedenceParsing(t *testing.T) {
 	tests := []OperatorPrecedenceTest{
 		{input: "1 + 2 + 3", expected: "((1 + 2) + 3)"},
 		{input: "1 * 2 + 3", expected: "((1 * 2) + 3)"},
@@ -272,6 +274,11 @@ func TestOperatorPrecedence(t *testing.T) {
 		{input: "false", expected: "false"},
 		{input: "3 > 5 == false", expected: "((3 > 5) == false)"},
 		{input: "3 < 5 == true", expected: "((3 < 5) == true)"},
+		{input: "1 + (2 + 3) + 4", expected: "((1 + (2 + 3)) + 4)"},
+		{input: "(5 + 5) * 2", expected: "((5 + 5) * 2)"},
+		{input: "2 / (5 + 5)", expected: "(2 / (5 + 5))"},
+		{input: "-(5 + 5)", expected: "(-(5 + 5))"},
+		{input: "!(true == true)", expected: "(!(true == true))"},
 	}
 
 	for _, tt := range tests {
