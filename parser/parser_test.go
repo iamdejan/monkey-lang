@@ -423,3 +423,86 @@ func TestIfElseExpression(t *testing.T) {
 }
 
 // end region if expressions
+
+// region function literal
+
+func TestFunctionLiteralParsing(t *testing.T) {
+	input := "fn(x, y) { x + y; }"
+
+	l := lexer.NewLexer(input)
+	p := NewParser(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. expected=`1` statement, actual=`%d` statement(s).", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not `*ast.ExpressionStatement`, but rather `%T`", program.Statements[0])
+	}
+
+	function, ok := stmt.Expression.(*ast.FunctionLiteral)
+	if !ok {
+		t.Fatalf("wrong type for stmt.Expression. exptected=`*ast.FunctionLiteral`, actual=`%T`", stmt.Expression)
+	}
+
+	if len(function.Parameters) != 2 {
+		t.Fatalf("wrong function.Parameters length. expected=`2`, actual=`%d`", len(function.Parameters))
+	}
+
+	testLiteralExpression(t, function.Parameters[0], "x")
+	testLiteralExpression(t, function.Parameters[1], "y")
+
+	if len(function.Body.Statements) != 1 {
+		t.Fatalf("wrong function.Body.Statements length. expected=`1`, actual=`%d`", len(function.Body.Statements))
+	}
+
+	bodyStmt, ok := function.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("wrong type for function.Body.Statements[0]. expected=`*ast.ReturnStatement`, actual=`%T`", function.Body.Statements[0])
+	}
+
+	testInfixExpression(t, bodyStmt.Expression, "x", "+", "y")
+}
+
+type FunctionParamTest struct {
+	input          string
+	expectedParams []string
+}
+
+func TestFunctionParameterParsing(t *testing.T) {
+	tests := []FunctionParamTest{
+		{input: "fn() {};", expectedParams: []string{}},
+		{input: "fn(x) {};", expectedParams: []string{"x"}},
+		{input: "fn(x, y, z) {};", expectedParams: []string{"x", "y", "z"}},
+	}
+
+	for _, tt := range tests {
+		l := lexer.NewLexer(tt.input)
+		p := NewParser(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not `*ast.ExpressionStatement`, but rather `%T`", program.Statements[0])
+		}
+
+		function, ok := stmt.Expression.(*ast.FunctionLiteral)
+		if !ok {
+			t.Fatalf("wrong type for stmt.Expression. exptected=`*ast.FunctionLiteral`, actual=`%T`", stmt.Expression)
+		}
+
+		if len(function.Parameters) != len(tt.expectedParams) {
+			t.Fatalf("wrong function.Parameters length. expected=`%d`, actual=`%d`", len(tt.expectedParams), len(function.Parameters))
+		}
+
+		for i, ident := range tt.expectedParams {
+			testLiteralExpression(t, function.Parameters[i], ident)
+		}
+	}
+}
+
+// end region function literal
