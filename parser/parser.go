@@ -61,6 +61,7 @@ func NewParser(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.False, p.parseBoolean)
 	p.registerPrefix(token.LeftParenthesis, p.parseGroupedExpression)
 	p.registerPrefix(token.If, p.parseIfExpression)
+	p.registerPrefix(token.Function, p.parseFunctionLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.Plus, p.parseInfixExpression)
@@ -72,6 +73,7 @@ func NewParser(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LessThan, p.parseInfixExpression)
 	p.registerInfix(token.GreaterThan, p.parseInfixExpression)
 
+	// read 2 tokens, so that current and peek / next token are set
 	p.nextToken()
 	p.nextToken()
 
@@ -348,4 +350,58 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 		p.nextToken()
 	}
 	return block
+}
+
+func (p *Parser) parseFunctionLiteral() ast.Expression {
+	lit := &ast.FunctionLiteral{
+		Token: p.current,
+	}
+
+	if !p.expectPeek(token.LeftParenthesis) {
+		return nil
+	}
+
+	lit.Parameters = p.parseFunctionParameters()
+
+	if !p.expectPeek(token.LeftBrace) {
+		return nil
+	}
+
+	lit.Body = p.parseBlockStatement()
+
+	return lit
+}
+
+func (p *Parser) parseFunctionParameters() []*ast.Identifier {
+	identifiers := []*ast.Identifier{}
+
+	if p.peek.Type == token.RightParenthesis {
+		p.nextToken()
+		return identifiers
+	}
+
+	p.nextToken()
+
+	ident := &ast.Identifier{
+		Token: p.current,
+		Value: p.current.Literal,
+	}
+	identifiers = append(identifiers, ident)
+
+	for p.peek.Type == token.Comma {
+		p.nextToken()
+		p.nextToken()
+
+		ident := &ast.Identifier{
+			Token: p.current,
+			Value: p.current.Literal,
+		}
+		identifiers = append(identifiers, ident)
+	}
+
+	if !p.expectPeek(token.RightParenthesis) {
+		return nil
+	}
+
+	return identifiers
 }
