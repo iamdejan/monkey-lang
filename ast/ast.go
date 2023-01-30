@@ -239,10 +239,11 @@ func (bs *BlockStatement) String() string {
 }
 
 type FunctionLiteral struct {
-	Token token.Token // the `fn` token
+	Token      token.Token // the `fn` token
 	Parameters []*Identifier
-	Body *BlockStatement
+	Body       *BlockStatement
 }
+
 func (fl *FunctionLiteral) expressionNode() {}
 func (fl *FunctionLiteral) TokenLiteral() string {
 	return fl.Token.Literal
@@ -252,7 +253,7 @@ func (fl *FunctionLiteral) String() string {
 	for _, p := range fl.Parameters {
 		params = append(params, p.String())
 	}
-	
+
 	var out bytes.Buffer
 
 	out.WriteString(fl.TokenLiteral())
