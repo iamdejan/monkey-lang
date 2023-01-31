@@ -20,14 +20,15 @@ const (
 )
 
 var precedences = map[token.TokenType]int{
-	token.Equal:       Equal,
-	token.NotEqual:    Equal,
-	token.LessThan:    LessOrGreater,
-	token.GreaterThan: LessOrGreater,
-	token.Plus:        Sum,
-	token.Minus:       Sum,
-	token.Slash:       Product,
-	token.Asterisk:    Product,
+	token.Equal:           Equal,
+	token.NotEqual:        Equal,
+	token.LessThan:        LessOrGreater,
+	token.GreaterThan:     LessOrGreater,
+	token.Plus:            Sum,
+	token.Minus:           Sum,
+	token.Slash:           Product,
+	token.Asterisk:        Product,
+	token.LeftParenthesis: Call,
 }
 
 type (
@@ -72,6 +73,7 @@ func NewParser(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.NotEqual, p.parseInfixExpression)
 	p.registerInfix(token.LessThan, p.parseInfixExpression)
 	p.registerInfix(token.GreaterThan, p.parseInfixExpression)
+	p.registerInfix(token.LeftParenthesis, p.parseCallExpression)
 
 	// read 2 tokens, so that current and peek / next token are set
 	p.nextToken()
@@ -404,4 +406,37 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	}
 
 	return identifiers
+}
+
+func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
+	exp := &ast.CallExpression{
+		Token:    p.current,
+		Function: function,
+	}
+	exp.Arguments = p.parseCallArguments()
+	return exp
+}
+
+func (p *Parser) parseCallArguments() []ast.Expression {
+	args := []ast.Expression{}
+
+	if p.peek.Type == token.RightParenthesis {
+		p.nextToken()
+		return args
+	}
+
+	p.nextToken()
+	args = append(args, p.parseExpression(Lowest))
+	for p.peek.Type == token.Comma {
+		p.nextToken()
+		p.nextToken()
+
+		args = append(args, p.parseExpression(Lowest))
+	}
+
+	if !p.expectPeek(token.RightParenthesis) {
+		return nil
+	}
+
+	return args
 }

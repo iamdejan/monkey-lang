@@ -278,6 +278,8 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{input: "2 / (5 + 5)", expected: "(2 / (5 + 5))"},
 		{input: "-(5 + 5)", expected: "(-(5 + 5))"},
 		{input: "!(true == true)", expected: "(!(true == true))"},
+		{input: "a + add(b * c) + d", expected: "((a + add((b * c))) + d)"},
+		{input: "add(a, b, 1, 2 * 3, 4 + 5)", expected: "add(a, b, 1, (2 * 3), (4 + 5))"},
 	}
 
 	for _, tt := range tests {
@@ -506,3 +508,42 @@ func TestFunctionParameterParsing(t *testing.T) {
 }
 
 // end region function literal
+
+// region call expression
+
+func TestCallExpressionParsing(t *testing.T) {
+	input := "add(1, 2 * 3, c);"
+
+	l := lexer.NewLexer(input)
+	p := NewParser(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("wrong program.Statements length. expected=`1`, actual=`%d`", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("wrong program.Statements[0] type. expected=`*ast.ExpressionStatement`, actual=`%T`", program.Statements[0])
+	}
+
+	exp, ok := stmt.Expression.(*ast.CallExpression)
+	if !ok {
+		t.Fatalf("wrong stmt.Expression type. expected=`*ast.CallExpression`, actual=`%T`", stmt.Expression)
+	}
+
+	if !testIdentifier(t, exp.Function, "add") {
+		return
+	}
+
+	if len(exp.Arguments) != 3 {
+		t.Fatalf("wrong exp.Arguments length. expected=`3`, actual=`%d`", len(exp.Arguments))
+	}
+
+	testLiteralExpression(t, exp.Arguments[0], 1)
+	testInfixExpression(t, exp.Arguments[1], 2, "*", 3)
+	testIdentifier(t, exp.Arguments[2], "c")
+}
+
+// end region call expression
