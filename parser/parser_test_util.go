@@ -45,6 +45,31 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	return true
 }
 
+func testReturnStatement(t *testing.T, stmt ast.Statement, value string) bool {
+	if stmt.TokenLiteral() != "return" {
+		t.Errorf("incorrect token literal. expected=`let`, actual=`%s`", stmt.TokenLiteral())
+		return false
+	}
+
+	returnStmt, ok := stmt.(*ast.ReturnStatement)
+	if !ok {
+		t.Errorf("wrong stmt type. expected=`*ast.ReturnStatement`, actual=`%T`", stmt)
+		return false
+	}
+
+	if returnStmt.TokenLiteral() != "return" {
+		t.Errorf("wrong returnStmt.TokenLiteral(). expected=`return`, actual=`%s`", returnStmt.TokenLiteral())
+		return false
+	}
+
+	if returnStmt.ReturnValue.String() != value {
+		t.Errorf("wrongreturnStmt.ReturnValue.String(). expected=`%s`, actual=`%s`", value, returnStmt.ReturnValue.String())
+		return false
+	}
+
+	return true
+}
+
 func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{}) bool {
 	switch v := expected.(type) {
 	case bool:

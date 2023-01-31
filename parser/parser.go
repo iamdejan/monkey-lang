@@ -198,8 +198,8 @@ func (p *Parser) parseReturnStatement() ast.Statement {
 
 	p.nextToken()
 
-	// TODO: for now, skipping the expression(s) until we encounter semicolon
-	for p.current.Type != token.Semicolon {
+	stmt.ReturnValue = p.parseExpression(Lowest)
+	if p.peek.Type == token.Semicolon {
 		p.nextToken()
 	}
 
