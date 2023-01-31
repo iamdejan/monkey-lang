@@ -180,8 +180,11 @@ func (p *Parser) parseLetStatement() ast.Statement {
 		return nil
 	}
 
-	// TODO: for now, skipping the expression(s) until we encounter semicolon
-	for p.current.Type != token.Semicolon {
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(Lowest)
+
+	if p.peek.Type == token.Semicolon {
 		p.nextToken()
 	}
 

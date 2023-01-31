@@ -20,6 +20,31 @@ func checkParseErrors(t *testing.T, p *Parser) {
 	t.FailNow()
 }
 
+func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
+	if s.TokenLiteral() != "let" {
+		t.Errorf("incorrect token literal. expected=`let`, actual=`%s`", s.TokenLiteral())
+		return false
+	}
+
+	letStmt, ok := s.(*ast.LetStatement)
+	if !ok {
+		t.Errorf("statement is not `*ast.LetStatement`, but rather `%T`", s)
+		return false
+	}
+
+	if letStmt.Name.Value != name {
+		t.Errorf("incorrect variable name. expected=`%s`, actual=`%s`", name, letStmt.Name.Value)
+		return false
+	}
+
+	if letStmt.Name.TokenLiteral() != name {
+		t.Errorf("incorrect letStmt.Name.TokenLiteral(). expected=`%s`, actual=`%s`", name, letStmt.Name.TokenLiteral())
+		return false
+	}
+
+	return true
+}
+
 func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{}) bool {
 	switch v := expected.(type) {
 	case bool:
