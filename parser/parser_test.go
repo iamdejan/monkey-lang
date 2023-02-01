@@ -8,102 +8,75 @@ import (
 
 // region let statement
 
+type LetTest struct {
+	input              string
+	expectedIdentifier string
+	expectedValue      interface{}
+}
+
 func TestLetStatements(t *testing.T) {
-	input := `
-	let x = 5;
-	let y = 1+2;
-	let foobar = add(3, 4);
-	`
-
-	l := lexer.NewLexer(input)
-	p := NewParser(l)
-
-	program := p.ParseProgram()
-	if program == nil {
-		t.Fatal("`program` is null")
+	tests := []LetTest{
+		{input: "let x = 5;", expectedIdentifier: "x", expectedValue: 5},
+		{input: "let y = true;", expectedIdentifier: "y", expectedValue: true},
+		{input: "let foobar = y;", expectedIdentifier: "foobar", expectedValue: "y"},
 	}
 
-	checkParseErrors(t, p)
+	for _, tt := range tests {
+		l := lexer.NewLexer(tt.input)
+		p := NewParser(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
 
-	if len(program.Statements) != 3 {
-		t.Fatal("`program` should have 3 statements")
-	}
+		if len(program.Statements) != 1 {
+			t.Fatalf("wrong program.Statements length. expected=`1`, actual=`%d`", len(program.Statements))
+		}
 
-	tests := []struct {
-		expectedIdentifier string
-	}{
-		{"x"},
-		{"y"},
-		{"foobar"},
-	}
+		stmt := program.Statements[0]
+		if !testLetStatement(t, stmt, tt.expectedIdentifier) {
+			return
+		}
 
-	for i, tt := range tests {
-		stmt := program.Statements[i]
-		if !correctLetStatement(t, stmt, tt.expectedIdentifier) {
+		val := stmt.(*ast.LetStatement).Value
+		if !testLiteralExpression(t, val, tt.expectedValue) {
 			return
 		}
 	}
-}
-
-func correctLetStatement(t *testing.T, s ast.Statement, name string) bool {
-	if s.TokenLiteral() != "let" {
-		t.Errorf("incorrect token literal. expected=`let`, actual=`%s`", s.TokenLiteral())
-		return false
-	}
-
-	letStmt, ok := s.(*ast.LetStatement)
-	if !ok {
-		t.Errorf("statement is not `*ast.LetStatement`, but rather `%T`", s)
-		return false
-	}
-
-	if letStmt.Name.Value != name {
-		t.Errorf("incorrect variable name. expected=`%s`, actual=`%s`", name, letStmt.Name.Value)
-		return false
-	}
-
-	if letStmt.Name.TokenLiteral() != name {
-		t.Errorf("incorrect letStmt.Name.TokenLiteral(). expected=`%s`, actual=`%s`", name, letStmt.Name.TokenLiteral())
-		return false
-	}
-
-	return true
 }
 
 // end region let statement
 
 // region return statement
 
+type ReturnTest struct {
+	input         string
+	expectedValue string
+}
+
 func TestReturnStatements(t *testing.T) {
-	input := `
-	return 5;
-	return 1+2;
-	return add(2,3);
-	`
-
-	l := lexer.NewLexer(input)
-	p := NewParser(l)
-
-	program := p.ParseProgram()
-	if program == nil {
-		t.Fatal("`program` is null")
+	tests := []ReturnTest{
+		{input: "return 5;", expectedValue: "5"},
+		{input: "return 1 + 2;", expectedValue: "(1 + 2)"},
+		{input: "return add(2, 3);", expectedValue: "add(2, 3)"},
 	}
 
-	checkParseErrors(t, p)
+	for _, tt := range tests {
+		l := lexer.NewLexer(tt.input)
+		p := NewParser(l)
 
-	if len(program.Statements) != 3 {
-		t.Fatal("`program` should have 3 statements")
-	}
-
-	for i, stmt := range program.Statements {
-		returnStmt, ok := stmt.(*ast.ReturnStatement)
-		if !ok {
-			t.Fatalf("[%d] wrong stmt type. expected=`*ast.ReturnStatement`, actual=`%T`", i, stmt)
-			continue
+		program := p.ParseProgram()
+		if program == nil {
+			t.Fatal("`program` is null")
 		}
 
-		if returnStmt.TokenLiteral() != "return" {
-			t.Fatalf("wrong returnStmt.TokenLiteral(). expected=`return`, actual=`%s`", returnStmt.TokenLiteral())
+		checkParseErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("wrong program.Statements length. expected=`1`, actual=`%d`", len(program.Statements))
+		}
+
+		stmt := program.Statements[0]
+		if !testReturnStatement(t, stmt, tt.expectedValue) {
+			return
 		}
 	}
 }
