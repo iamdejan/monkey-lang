@@ -6,11 +6,27 @@ import (
 	"io"
 	"monkey/lexer"
 	"monkey/parser"
+	"os"
+	"os/user"
 )
 
 const PROMPT = ">> "
 
-func Start(in io.Reader, out io.Writer) {
+func Start() {
+	user, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
+
+	for i := 0; i <= 50; i++ {
+		fmt.Println("")
+	}
+	fmt.Printf("Hello to %s! This is the Monkey Programming Language from \"Writing An Interpreter in Go\"\n", user.Name)
+	fmt.Println("Feel free to try!")
+	start(os.Stdin, os.Stdout)
+}
+
+func start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 
 	for {
@@ -38,5 +54,6 @@ func Start(in io.Reader, out io.Writer) {
 func printParserErrors(out io.Writer, errors []string) {
 	for _, msg := range errors {
 		io.WriteString(out, "\t"+msg+"\t")
+		io.WriteString(out, "\n")
 	}
 }
