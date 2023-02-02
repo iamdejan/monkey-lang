@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/akamensky/argparse"
+	"monkey/file"
 	"monkey/repl"
 	"os"
-	"monkey/file"
-	"github.com/akamensky/argparse"
 )
 
 func main() {
