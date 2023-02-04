@@ -2,21 +2,35 @@ package main
 
 import (
 	"fmt"
+	"github.com/akamensky/argparse"
+	"monkey/file"
 	"monkey/repl"
 	"os"
-	"os/user"
+)
+
+const (
+	CODE_FILE = 0
+	FILE_NAME = 1
 )
 
 func main() {
-	user, err := user.Current()
+	argparser := argparse.NewParser("monkey", "Monkey Language")
+	f := argparser.File("i", "input-file", os.O_RDONLY, 0444, &argparse.Options{Required: false, Help: "Source code of monkey language. It must be *.monkey"})
+
+	err := argparser.Parse(os.Args)
 	if err != nil {
-		panic(err)
+		fmt.Print(argparser.Usage(err))
+		os.Exit(1)
 	}
 
-	for i := 0; i <= 50; i++ {
-		fmt.Println("")
+	if argparser.GetArgs()[FILE_NAME].GetParsed() {
+		fs := file.Start(f)
+		if !fs {
+			os.Exit(1)
+		}
+		os.Exit(0)
 	}
-	fmt.Printf("Hello to %s! This is the Monkey Programming Language from \"Writing An Interpreter in Go\"\n", user.Name)
-	fmt.Println("Feel free to try!")
-	repl.Start(os.Stdin, os.Stdout)
+
+	repl.Start()
+	os.Exit(0)
 }
