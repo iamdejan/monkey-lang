@@ -38,7 +38,7 @@ func (p *Program) String() string {
 
 	for i, s := range p.Statements {
 		out.WriteString(s.String())
-		if i + 1 < len(p.Statements) {
+		if i+1 < len(p.Statements) {
 			out.WriteString("\n")
 		}
 	}

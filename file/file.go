@@ -30,6 +30,5 @@ func Start(f *os.File) bool {
 
 	out.WriteString(program.String() + "\n")
 
-
 	return true
 }
