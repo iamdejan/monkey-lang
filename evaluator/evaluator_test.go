@@ -3,7 +3,7 @@ package evaluator
 import "testing"
 
 type IntegerEvalTest struct {
-	input string
+	input    string
 	expected int64
 }
 
@@ -18,5 +18,3 @@ func TestEvalIntegerExpression(t *testing.T) {
 		testIntegerObject(t, evaluated, tt.expected)
 	}
 }
-
-

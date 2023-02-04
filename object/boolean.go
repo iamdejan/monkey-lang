@@ -9,6 +9,7 @@ const (
 type Boolean struct {
 	Value bool
 }
+
 func (b *Boolean) Type() ObjectType {
 	return BOOLEAN_OBJ
 }

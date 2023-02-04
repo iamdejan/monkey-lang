@@ -4,7 +4,8 @@ const (
 	NULL_OBJ = "NULL"
 )
 
-type Null struct {}
+type Null struct{}
+
 func (n *Null) Type() ObjectType {
 	return NULL_OBJ
 }
