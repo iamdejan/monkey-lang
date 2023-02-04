@@ -2,15 +2,16 @@ package file
 
 import (
 	"bufio"
-	"fmt"
 	"monkey/lexer"
 	"monkey/parser"
+	"monkey/util"
 	"os"
 )
 
-func Start(f *os.File) {
+func Start(f *os.File) bool {
 	defer f.Close()
 
+	out := os.Stdout
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -20,11 +21,12 @@ func Start(f *os.File) {
 
 		program := p.ParseProgram()
 		if len(p.Errors()) > 0 {
-			for _, msg := range p.Errors() {
-				fmt.Println("\t" + msg + "\t")
-			}
-			continue
+			util.PrintParserErrors(out, p.Errors())
+			return false
 		}
-		fmt.Println(program.String())
+
+		out.WriteString(program.String() + "\n")
 	}
+
+	return true
 }

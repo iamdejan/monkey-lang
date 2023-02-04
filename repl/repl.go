@@ -6,6 +6,7 @@ import (
 	"io"
 	"monkey/lexer"
 	"monkey/parser"
+	"monkey/util"
 	"os"
 	"os/user"
 )
@@ -42,18 +43,11 @@ func start(in io.Reader, out io.Writer) {
 
 		program := p.ParseProgram()
 		if len(p.Errors()) > 0 {
-			printParserErrors(out, p.Errors())
+			util.PrintParserErrors(out, p.Errors())
 			continue
 		}
 
 		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
-	}
-}
-
-func printParserErrors(out io.Writer, errors []string) {
-	for _, msg := range errors {
-		io.WriteString(out, "\t"+msg+"\t")
 		io.WriteString(out, "\n")
 	}
 }
