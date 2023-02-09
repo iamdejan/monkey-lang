@@ -29,3 +29,18 @@ func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
 
 	return true
 }
+
+func testBooleanObject(t *testing.T, obj object.Object, expected bool) bool {
+	result, ok := obj.(*object.Boolean)
+	if !ok {
+		t.Errorf("wrong obj type. expected=`*object.Integer`, actual=`%T`", obj)
+		return false
+	}
+
+	if result.Value != expected {
+		t.Errorf("wrong result.Value. expected=`%t`, actual=%t", expected, result.Value)
+		return false
+	}
+
+	return true
+}
