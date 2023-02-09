@@ -18,3 +18,20 @@ func TestEvalIntegerExpression(t *testing.T) {
 		testIntegerObject(t, evaluated, tt.expected)
 	}
 }
+
+type BoolEvalTest struct {
+	input    string
+	expected bool
+}
+
+func TestEvalBooleanExpression(t *testing.T) {
+	tests := []BoolEvalTest{
+		{input: "true", expected: true},
+		{input: "false", expected: false},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testBooleanObject(t, evaluated, tt.expected)
+	}
+}
