@@ -15,30 +15,30 @@ func testEval(input string) object.Object {
 	return Eval(program)
 }
 
-func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
+func testIntegerObject(t *testing.T, obj object.Object, expected int64, input string) bool {
 	result, ok := obj.(*object.Integer)
 	if !ok {
-		t.Errorf("wrong obj type. expected=`*object.Integer`, actual=`%T`", obj)
+		t.Errorf("wrong obj type for input `%s`. expected=`*object.Integer`, actual=`%T`", input, obj)
 		return false
 	}
 
 	if result.Value != expected {
-		t.Errorf("wrong result.Value. expected=`%d`, actual=%d", expected, result.Value)
+		t.Errorf("wrong result.Value for input `%s`. expected=%d, actual=%d", input, expected, result.Value)
 		return false
 	}
 
 	return true
 }
 
-func testBooleanObject(t *testing.T, obj object.Object, expected bool) bool {
+func testBooleanObject(t *testing.T, obj object.Object, expected bool, input string) bool {
 	result, ok := obj.(*object.Boolean)
 	if !ok {
-		t.Errorf("wrong obj type. expected=`*object.Integer`, actual=`%T`", obj)
+		t.Errorf("wrong obj type for input `%s`. expected=`*object.Integer`, actual=`%T`", input, obj)
 		return false
 	}
 
 	if result.Value != expected {
-		t.Errorf("wrong result.Value. expected=`%t`, actual=%t", expected, result.Value)
+		t.Errorf("wrong result.Value for input `%s`. expected=`%t`, actual=%t", input, expected, result.Value)
 		return false
 	}
 
