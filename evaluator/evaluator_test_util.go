@@ -44,3 +44,11 @@ func testBooleanObject(t *testing.T, obj object.Object, expected bool, input str
 
 	return true
 }
+
+func testNullObject(t *testing.T, obj object.Object, input string) bool {
+	if obj != NULL {
+		t.Errorf("input `%s` should produce NULL", input)
+		return false
+	}
+	return true
+}
