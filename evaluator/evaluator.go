@@ -22,6 +22,8 @@ func Eval(node ast.Node) object.Object {
 		left := Eval(node.Left)
 		right := Eval(node.Right)
 		return evalInfixExpression(node.Operator, left, right)
+	case *ast.ReturnStatement:
+		return evalReturnExpression(node)
 	case *ast.BlockStatement:
 		return evalStatements(node.Statements)
 	case *ast.IfExpression:
@@ -150,4 +152,9 @@ func isTruthy(condition object.Object) bool {
 		return false
 	}
 	return true
+}
+
+func evalReturnExpression(node *ast.ReturnStatement) object.Object {
+	retExp := node.ReturnValue
+	return Eval(retExp)
 }
