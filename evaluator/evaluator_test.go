@@ -115,8 +115,8 @@ func TestReturnStatement(t *testing.T) {
 	tests := []ReturnTest{
 		{input: "return 5;", expected: 5},
 		{input: "return -10;", expected: -10},
-		{input: "return 1-2;", expected: 1-2},
-		{input: "return 1-2+3;", expected: 1-2+3},
+		{input: "return 1-2;", expected: 1 - 2},
+		{input: "return 1-2+3;", expected: 1 - 2 + 3},
 		{input: "return true;", expected: true},
 		{input: "return false;", expected: false},
 	}
