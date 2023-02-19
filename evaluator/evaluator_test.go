@@ -105,3 +105,49 @@ func TestIfElseExpression(t *testing.T) {
 		}
 	}
 }
+
+type ReturnTest struct {
+	input    string
+	expected interface{}
+}
+
+func TestReturnStatement(t *testing.T) {
+	tests := []ReturnTest{
+		{input: "return 5;", expected: 5},
+		{input: "return -10;", expected: -10},
+		{input: "return 1-2;", expected: 1 - 2},
+		{input: "return 1-2+3;", expected: 1 - 2 + 3},
+		{input: "return true;", expected: true},
+		{input: "return false;", expected: false},
+		{input: "return null;", expected: nil},
+		{input: "5; return null; 5", expected: nil},
+		{input: "return 10; 9;", expected: 10},
+		{input: "return 2 * 5; 9;", expected: 2 * 5},
+		{input: "9; return 2 * 5; 9;", expected: 2 * 5},
+		{input: `
+		if (10 > 1) {
+			if (10 > 1) {
+				return 10;
+			}
+
+			return 1;
+		}`, expected: 10},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer), tt.input)
+			return
+		}
+
+		boolean, ok := tt.expected.(bool)
+		if ok {
+			testBooleanObject(t, evaluated, boolean, tt.input)
+			return
+		}
+
+		testNullObject(t, evaluated, tt.input)
+	}
+}
