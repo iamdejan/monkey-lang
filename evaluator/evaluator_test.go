@@ -119,6 +119,17 @@ func TestReturnStatement(t *testing.T) {
 		{input: "return 1-2+3;", expected: 1 - 2 + 3},
 		{input: "return true;", expected: true},
 		{input: "return false;", expected: false},
+		{input: "return 10; 9;", expected: 10},
+		{input: "return 2 * 5; 9;", expected: 2 * 5},
+		{input: "9; return 2 * 5; 9;", expected: 2 * 5},
+		{input: `
+		if (10 > 1) {
+			if (10 > 1) {
+				return 10;
+			}
+
+			return 1;
+		}`, expected: 10},
 	}
 
 	for _, tt := range tests {
