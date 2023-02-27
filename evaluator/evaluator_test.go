@@ -177,6 +177,7 @@ func TestErrorHandling(t *testing.T) {
 
 			return 1;
 		}`, expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"},
+		{input: "foobar;", expectedMessage: "identifier not found: foobar"},
 	}
 
 	for _, tt := range tests {
@@ -191,5 +192,23 @@ func TestErrorHandling(t *testing.T) {
 		if errObj.Message != tt.expectedMessage {
 			t.Errorf("wrong error message. expected=`%s`, actual=`%s`", tt.expectedMessage, errObj.Message)
 		}
+	}
+}
+
+type LetTest struct {
+	input    string
+	expected int64
+}
+
+func TestLetStatements(t *testing.T) {
+	tests := []LetTest{
+		{input: "let a = 5; a;", expected: 5},
+		{input: "let a = 5 * 5; a;", expected: 5 * 5},
+		{input: "let a = 5; let b = a; b;", expected: 5},
+		{input: "let a = 5; let b = a; let c = a + b + 5; c;", expected: 15},
+	}
+
+	for _, tt := range tests {
+		testIntegerObject(t, testEval(tt.input), tt.expected, tt.input)
 	}
 }
