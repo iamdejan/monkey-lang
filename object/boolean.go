@@ -2,9 +2,7 @@ package object
 
 import "fmt"
 
-const (
-	BOOLEAN_OBJ = "BOOLEAN"
-)
+const BOOLEAN_OBJ = "BOOLEAN"
 
 type Boolean struct {
 	Value bool

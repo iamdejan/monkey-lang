@@ -2,9 +2,7 @@ package object
 
 import "fmt"
 
-const (
-	INTEGER_OBJ = "INTEGER"
-)
+const INTEGER_OBJ = "INTEGER"
 
 type Integer struct {
 	Value int64

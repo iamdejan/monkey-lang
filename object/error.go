@@ -1,8 +1,6 @@
 package object
 
-const (
-	ERROR_OBJ = "ERROR"
-)
+const ERROR_OBJ = "ERROR"
 
 type Error struct {
 	Message string

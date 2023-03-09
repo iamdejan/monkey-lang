@@ -212,3 +212,46 @@ func TestLetStatements(t *testing.T) {
 		testIntegerObject(t, testEval(tt.input), tt.expected, tt.input)
 	}
 }
+
+func TestFunctionObject(t *testing.T) {
+	input := "fn(x) { x + 2; };"
+
+	evaluated := testEval(input)
+	fn, ok := evaluated.(*object.Function)
+	if !ok {
+		t.Fatalf("`evaluated` object got wrong type. expected=`*object.Function`, actual=`%T`", evaluated)
+	}
+
+	if len(fn.Parameters) != 1 {
+		t.Fatalf("function `fn` has wrong parameter count. expected=`1`, actual=`%d`", len(fn.Parameters))
+	}
+
+	if fn.Parameters[0].String() != "x" {
+		t.Fatalf("wrong parameter name. expected=`x`, actual=`%s`", fn.Parameters[0].String())
+	}
+
+	expectedBody := "(x + 2)"
+	if fn.Body.String() != expectedBody {
+		t.Fatalf("wrong `fn.Body`. expected=`%s`, actual=`%s`", expectedBody, fn.Body.String())
+	}
+}
+
+type FunctionCallTest struct {
+	input    string
+	expected int64
+}
+
+func TestFunctionApplication(t *testing.T) {
+	tests := []FunctionCallTest{
+		{input: "let identity = fn(x) { x; }; identity(5);", expected: 5},
+		{input: "let identity = fn(x) { return x; }; identity(5);", expected: 5},
+		{input: "let double = fn(x) { return x * 2; }; double(5);", expected: 5 * 2},
+		{input: "let add = fn(x, y) { x + y; }; add(1, 2);", expected: 1 + 2},
+		{input: "let add = fn(x, y) { x + y; }; add(5, add(1, 2));", expected: 8},
+		{input: "fn(x) { x; }(5);", expected: 5},
+	}
+
+	for _, tt := range tests {
+		testIntegerObject(t, testEval(tt.input), tt.expected, tt.input)
+	}
+}
