@@ -1,8 +1,6 @@
 package object
 
-const (
-	RETURN_VALUE_OBJ = "RETURN_VALUE"
-)
+const RETURN_VALUE_OBJ = "RETURN_VALUE"
 
 type ReturnValue struct {
 	Value Object

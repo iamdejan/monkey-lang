@@ -1,8 +1,6 @@
 package object
 
-const (
-	NULL_OBJ = "NULL"
-)
+const NULL_OBJ = "NULL"
 
 type Null struct{}
 
