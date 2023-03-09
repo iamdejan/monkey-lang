@@ -237,7 +237,7 @@ func TestFunctionObject(t *testing.T) {
 }
 
 type FunctionCallTest struct {
-	input string
+	input    string
 	expected int64
 }
 
