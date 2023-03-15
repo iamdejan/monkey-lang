@@ -2,14 +2,14 @@ package object
 
 import "fmt"
 
-const BOOLEAN_OBJ = "BOOLEAN"
+const BooleanObj = "BOOLEAN"
 
 type Boolean struct {
 	Value bool
 }
 
 func (b *Boolean) Type() ObjectType {
-	return BOOLEAN_OBJ
+	return BooleanObj
 }
 func (b *Boolean) Inspect() string {
 	return fmt.Sprintf("%t", b.Value)

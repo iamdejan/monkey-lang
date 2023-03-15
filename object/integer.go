@@ -2,14 +2,14 @@ package object
 
 import "fmt"
 
-const INTEGER_OBJ = "INTEGER"
+const IntegerObj = "INTEGER"
 
 type Integer struct {
 	Value int64
 }
 
 func (i *Integer) Type() ObjectType {
-	return INTEGER_OBJ
+	return IntegerObj
 }
 func (i *Integer) Inspect() string {
 	return fmt.Sprintf("%d", i.Value)

@@ -13,18 +13,19 @@ import (
 	"os/user"
 )
 
-const PROMPT = ">> "
+const Prompt = ">> "
 
 func Start() {
+	for i := 0; i <= 50; i++ {
+		fmt.Println("")
+	}
+
 	user, err := user.Current()
 	if err != nil {
 		panic(err)
 	}
 
-	for i := 0; i <= 50; i++ {
-		fmt.Println("")
-	}
-	fmt.Printf("Hello to %s! This is the Monkey Programming Language from \"Writing An Interpreter in Go\"\n", user.Name)
+	fmt.Printf("Hello, `%s`! This is the Monkey Programming Language from \"Writing An Interpreter in Go\"\n", user.Username)
 	fmt.Println("Feel free to try!")
 	start(os.Stdin, os.Stdout)
 }
@@ -34,7 +35,7 @@ func start(in io.Reader, out io.Writer) {
 	env := object.NewEnvironment()
 
 	for {
-		fmt.Fprint(out, PROMPT)
+		fmt.Fprint(out, Prompt)
 		scanned := scanner.Scan()
 		if !scanned {
 			return

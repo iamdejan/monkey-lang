@@ -1,13 +1,13 @@
 package object
 
-const ERROR_OBJ = "ERROR"
+const ErrorObj = "ERROR"
 
 type Error struct {
 	Message string
 }
 
 func (e *Error) Type() ObjectType {
-	return ERROR_OBJ
+	return ErrorObj
 }
 func (e *Error) Inspect() string {
 	return "ERROR: " + e.Message
