@@ -84,6 +84,11 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.RightBrace, l.character)
 	case 0:
 		tok = newToken(token.Eof, l.character)
+	case '"':
+		tok = token.Token{
+			Type: token.String,
+		}
+		tok.Literal = l.readString()
 	default:
 		if isLetter(l.character) {
 			tok.Literal = l.readIdentifier()
@@ -127,4 +132,16 @@ func (l *Lexer) peekChar() byte {
 	}
 
 	return l.input[l.readPosition]
+}
+
+func (l *Lexer) readString() string {
+	startPos := l.position + 1
+	for {
+		l.readCharacter()
+		if l.character == '"' || l.character == 0 {
+			break
+		}
+	}
+
+	return l.input[startPos:l.position]
 }

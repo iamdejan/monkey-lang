@@ -45,4 +45,6 @@ const (
 	Return   = "Return"
 	True     = "True"
 	False    = "False"
+
+	String = "String"
 )

@@ -172,3 +172,19 @@ func testLexer(t *testing.T, input string, tests []token.Token) {
 		}
 	}
 }
+
+func TestNextToken_String(t *testing.T) {
+	input := `
+	"foobar"
+	"foo bar"
+	"12345"
+	`
+
+	tests := []token.Token{
+		{Type: token.String, Literal: "foobar"},
+		{Type: token.String, Literal: "foo bar"},
+		{Type: token.String, Literal: "12345"},
+	}
+
+	testLexer(t, input, tests)
+}
