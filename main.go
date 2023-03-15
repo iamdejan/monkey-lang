@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	CODE_FILE = 0
-	FILE_NAME = 1
+	CodeFile = 0
+	InputFileName = 1
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if argparser.GetArgs()[FILE_NAME].GetParsed() {
+	if argparser.GetArgs()[InputFileName].GetParsed() {
 		fs := file.Start(f)
 		if !fs {
 			os.Exit(1)

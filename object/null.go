@@ -1,11 +1,11 @@
 package object
 
-const NULL_OBJ = "NULL"
+const NullObj = "NULL"
 
 type Null struct{}
 
 func (n *Null) Type() ObjectType {
-	return NULL_OBJ
+	return NullObj
 }
 func (n *Null) Inspect() string {
 	return "null"

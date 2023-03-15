@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const FUNCTION_OBJ = "FUNCTION"
+const FunctionObj = "FUNCTION"
 
 type Function struct {
 	Parameters []*ast.Identifier
@@ -15,7 +15,7 @@ type Function struct {
 }
 
 func (f *Function) Type() ObjectType {
-	return FUNCTION_OBJ
+	return FunctionObj
 }
 func (f *Function) Inspect() string {
 	var out bytes.Buffer
