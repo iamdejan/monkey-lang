@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	CodeFile = 0
+	CodeFile      = 0
 	InputFileName = 1
 )
 
