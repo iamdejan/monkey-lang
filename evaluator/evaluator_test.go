@@ -178,6 +178,7 @@ func TestErrorHandling(t *testing.T) {
 			return 1;
 		}`, expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"},
 		{input: "foobar;", expectedMessage: "identifier not found: foobar"},
+		{input: `"Hello" - "world"`, expectedMessage: "unknown operator: STRING - STRING"},
 	}
 
 	for _, tt := range tests {
@@ -266,6 +267,21 @@ func TestStringLiteral(t *testing.T) {
 	}
 
 	expected := "Hello world!"
+	if str.Value != expected {
+		t.Fatalf("wrong value for `str.Value`. expected=`%s`, actual=`%s`", expected, str.Value)
+	}
+}
+
+func TestStringConcatenation(t *testing.T) {
+	input := `"Hello" + " " + "world";`
+
+	evaluated := testEval(input)
+	str, ok := evaluated.(*object.String)
+	if !ok {
+		t.Fatalf("wrong type for `evaluated`. expected=`*object.String`, actual=`%T` (%+v)", evaluated, evaluated)
+	}
+
+	expected := "Hello world"
 	if str.Value != expected {
 		t.Fatalf("wrong value for `str.Value`. expected=`%s`, actual=`%s`", expected, str.Value)
 	}

@@ -1,6 +1,6 @@
 package object
 
-const StringObj = "String"
+const StringObj = "STRING"
 
 type String struct {
 	Value string
