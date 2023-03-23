@@ -520,3 +520,27 @@ func TestCallExpressionParsing(t *testing.T) {
 }
 
 // end region call expression
+
+// region string literal expression
+
+func TestStringLiteralExpression(t *testing.T) {
+	input := `"hello world";`
+
+	l := lexer.NewLexer(input)
+	p := NewParser(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	stmt := program.Statements[0].(*ast.ExpressionStatement)
+	literal, ok := stmt.Expression.(*ast.StringLiteral)
+	if !ok {
+		t.Fatalf("wrong type for `stmt`. expected=`*ast.StringLiteral`, actual=`%T`", stmt.Expression)
+	}
+
+	expected := "hello world"
+	if literal.Value != expected {
+		t.Fatalf("wrong `literal.Value`. expected=`%s`, actual=`%s`", expected, literal.Value)
+	}
+}
+
+// end region string literal expression
