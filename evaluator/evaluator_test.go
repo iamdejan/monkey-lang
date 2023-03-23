@@ -255,3 +255,18 @@ func TestFunctionApplication(t *testing.T) {
 		testIntegerObject(t, testEval(tt.input), tt.expected, tt.input)
 	}
 }
+
+func TestStringLiteral(t *testing.T) {
+	input := `"Hello world!"`
+
+	evaluated := testEval(input)
+	str, ok := evaluated.(*object.String)
+	if !ok {
+		t.Fatalf("wrong type for `evaluated`. expected=`*object.String`, actual=`%T`", evaluated)
+	}
+
+	expected := "Hello world!"
+	if str.Value != expected {
+		t.Fatalf("wrong value for `str.Value`. expected=`%s`, actual=`%s`", expected, str.Value)
+	}
+}
