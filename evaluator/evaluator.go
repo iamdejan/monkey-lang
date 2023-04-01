@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	TRUE  = &object.Boolean{Value: true}
-	FALSE = &object.Boolean{Value: false}
-	NULL  = &object.Null{}
+	True  = &object.Boolean{Value: true}
+	False = &object.Boolean{Value: false}
+	Null  = &object.Null{}
 )
 
 func Eval(node ast.Node, env *object.Environment) object.Object {
@@ -117,10 +117,10 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 
 func nativeToBooleanObject(input bool) *object.Boolean {
 	if input {
-		return TRUE
+		return True
 	}
 
-	return FALSE
+	return False
 }
 
 func evalPrefixExpression(operator string, right object.Object) object.Object {
@@ -136,14 +136,14 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 
 func evalBangOperatorExpression(right object.Object) object.Object {
 	switch right {
-	case TRUE:
-		return FALSE
-	case FALSE:
-		return TRUE
-	case NULL:
-		return TRUE
+	case True:
+		return False
+	case False:
+		return True
+	case Null:
+		return True
 	default:
-		return FALSE
+		return False
 	}
 }
 
@@ -226,16 +226,16 @@ func evalIfExpression(node *ast.IfExpression, env *object.Environment) object.Ob
 	} else if node.Alternative != nil {
 		return Eval(node.Alternative, env)
 	}
-	return NULL
+	return Null
 }
 
 func isTruthy(condition object.Object) bool {
 	switch condition {
-	case NULL:
+	case Null:
 		return false
-	case TRUE:
+	case True:
 		return true
-	case FALSE:
+	case False:
 		return false
 	}
 	return true
@@ -266,12 +266,15 @@ func isError(obj object.Object) bool {
 }
 
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
-	val, ok := env.Get(node.Value)
-	if !ok {
-		return newError("identifier not found: " + node.Value)
+	if val, ok := env.Get(node.Value); ok {
+		return val
 	}
 
-	return val
+	if builtIn, ok := builtIns[node.Value]; ok {
+		return builtIn
+	}
+
+	return newError("identifier not found: " + node.Value)
 }
 
 func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Object {
@@ -290,15 +293,16 @@ func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Ob
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
-	function, ok := fn.(*object.Function)
-	if !ok {
+	switch fn := fn.(type) {
+	case *object.Function:
+		extendedEnv := extendFunctionEnv(fn, args)
+		evaluated := Eval(fn.Body, extendedEnv)
+		return unwrapReturnValue(evaluated)
+	case *object.BuiltIn:
+		return fn.Fn(args...)
+	default:
 		return newError("not a function: %s", fn.Type())
 	}
-
-	extendedEnv := extendFunctionEnv(function, args)
-	evaluated := Eval(function.Body, extendedEnv)
-	return unwrapReturnValue(evaluated)
-
 }
 
 func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Environment {
