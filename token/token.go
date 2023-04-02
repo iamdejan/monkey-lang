@@ -47,4 +47,8 @@ const (
 	False    = "False"
 
 	String = "String"
+
+	// array
+	LeftBracket  = "["
+	RightBracket = "]"
 )

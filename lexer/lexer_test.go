@@ -188,3 +188,17 @@ func TestNextToken_String(t *testing.T) {
 
 	testLexer(t, input, tests)
 }
+
+func TestNextToken_Brackets(t *testing.T) {
+	input := `[1, 2]`;
+
+	tests := []token.Token{
+		{Type: token.LeftBracket, Literal: "["},
+		{Type: token.Integer, Literal: "1"},
+		{Type: token.Comma, Literal: ","},
+		{Type: token.Integer, Literal: "2"},
+		{Type: token.RightBracket, Literal: "]"},
+	}
+
+	testLexer(t, input, tests)
+}
