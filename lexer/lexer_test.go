@@ -190,7 +190,7 @@ func TestNextToken_String(t *testing.T) {
 }
 
 func TestNextToken_Brackets(t *testing.T) {
-	input := `[1, 2]`;
+	input := `[1, 2]`
 
 	tests := []token.Token{
 		{Type: token.LeftBracket, Literal: "["},

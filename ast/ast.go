@@ -308,7 +308,7 @@ func (sl *StringLiteral) String() string {
 }
 
 type ArrayLiteral struct {
-	Token token.Token
+	Token    token.Token
 	Elements []Expression
 }
 

@@ -548,7 +548,7 @@ func TestStringLiteralExpression(t *testing.T) {
 // region array literal expression
 
 func TestParsingArrayLiterals(t *testing.T) {
-	input := `[1, 2 * 2, 3 + 3]`;
+	input := `[1, 2 * 2, 3 + 3]`
 
 	l := lexer.NewLexer(input)
 	p := NewParser(l)
