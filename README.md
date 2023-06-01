@@ -45,6 +45,20 @@ You can install Python by downloading the setup from [here](https://www.python.o
 
 Reference: https://stackoverflow.com/a/12476379
 
+## How to Run
+
+The easiest way to try this is to run the REPL:
+```sh
+go run main.go
+```
+
+However, the *slight* inconvenience is that you cannot use arrow keys, since that will only return escape sequence(s) of the key (e.g. `^[[D`). To solve that issue, you can use [rlfe](https://manpages.debian.org/unstable/rlfe/rlfe.1.en.html) like this:
+```sh
+rlfe go run main.go
+```
+
+However, I'm not sure if `rlfe` exists on Mac OS. I only tested this on Ubuntu 22.04.
+
 ## Pre-Commit Hook
 
 Everytime you create / edit `.pre-commit-config.yaml` file, don't forget to run this command:
