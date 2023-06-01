@@ -253,6 +253,8 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{input: "!(true == true)", expected: "(!(true == true))"},
 		{input: "a + add(b * c) + d", expected: "((a + add((b * c))) + d)"},
 		{input: "add(a, b, 1, 2 * 3, 4 + 5)", expected: "add(a, b, 1, (2 * 3), (4 + 5))"},
+		{input: "a * [1, 2, 3, 4][b * c] * d", expected: "((a * ([1, 2, 3, 4][(b * c)])) * d)"},
+		{input: "add(a * b[2], b[1], 2 * [1, 2][1])", expected: "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"},
 	}
 
 	for _, tt := range tests {
@@ -571,3 +573,26 @@ func TestParsingArrayLiterals(t *testing.T) {
 }
 
 // end region array literal expression
+
+func TestParsingIndexExpressions(t *testing.T) {
+	input := "myArray[1 + 1]"
+
+	l := lexer.NewLexer(input)
+	p := NewParser(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	indexExp, ok := stmt.Expression.(*ast.IndexExpression)
+	if !ok {
+		t.Fatalf("wrong type for `indexExp`. expected=`*ast.IndexExpression`, actual=`%T`", stmt.Expression)
+	}
+
+	if !testIdentifier(t, indexExp.Left, "myArray") {
+		return
+	}
+
+	if !testInfixExpression(t, indexExp.Index, 1, "+", 1) {
+		return
+	}
+}
