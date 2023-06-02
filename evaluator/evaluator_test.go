@@ -320,3 +320,21 @@ func TestBuiltInFunctions(t *testing.T) {
 		}
 	}
 }
+
+func TestArrayLiterals(t *testing.T) {
+	input := `[1, 2 * 2, 3 + 3]`
+
+	evaluated := testEval(input)
+	result, ok := evaluated.(*object.Array)
+	if !ok {
+		t.Fatalf("wrong type for `evaluated`. expected=`*object.Array`, actual=`%T`", evaluated)
+	}
+
+	if len(result.Elements) != 3 {
+		t.Fatalf("`result.Elements` has wrong number of elements. expected=`3`, actual=`%d`", len(result.Elements))
+	}
+
+	testIntegerObject(t, result.Elements[0], 1, "1")
+	testIntegerObject(t, result.Elements[1], 4, "2 * 2")
+	testIntegerObject(t, result.Elements[2], 6, "3 + 3")
+}

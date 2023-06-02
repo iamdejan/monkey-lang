@@ -27,6 +27,7 @@ func Start() {
 
 	fmt.Printf("Hello, `%s`! This is the Monkey Programming Language from \"Writing An Interpreter in Go\"\n", user.Username)
 	fmt.Println("Feel free to try!")
+	fmt.Println("NOTE: to look at all available options, use `--help` argument.")
 	start(os.Stdin, os.Stdout)
 }
 
