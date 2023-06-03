@@ -294,11 +294,16 @@ type BuiltInFunctionTest struct {
 
 func TestBuiltInFunctions(t *testing.T) {
 	tests := []BuiltInFunctionTest{
+		// `len` method
 		{input: `len("")`, expected: 0},
 		{input: `len("four")`, expected: 4},
 		{input: `len("hello world")`, expected: 11},
-		{input: `len(1)`, expected: "wrong argument type for `len` function. expected=`STRING`, actual=`INTEGER`"},
+		{input: `len(1)`, expected: "argument to `len` method is not supported. actual=`INTEGER`"},
 		{input: `len("one", "two")`, expected: "wrong argument count for `len` function. expected=`1`, actual=`2`"},
+
+		// `first` method
+		{input: `first("")`, expected: nil},
+		{input: `first("four")`, expected: "f"},
 	}
 
 	for _, tt := range tests {
@@ -308,15 +313,18 @@ func TestBuiltInFunctions(t *testing.T) {
 		case int:
 			testIntegerObject(t, evaluated, int64(expected), tt.input)
 		case string:
-			errObj, ok := evaluated.(*object.Error)
-			if !ok {
-				t.Errorf("wrong error type. expected=`object.Error`, actual=`%T` (%+v)", evaluated, evaluated)
-				continue
+			switch e := evaluated.(type) {
+			case *object.String:
+				if tt.expected != e.Value {
+					t.Errorf("wrong value for input `%s`. expected=`%s`, actual=`%s`", tt.input, tt.expected, e.Value)
+				}
+			case *object.Error:
+				if e.Message != expected {
+					t.Errorf("wrong error message for input `%s`. expected=`%s`, actual=`%s`", tt.input, expected, e.Message)
+				}
 			}
-
-			if errObj.Message != expected {
-				t.Errorf("wrong error message. expected=`%s`, actual=`%s`", expected, errObj.Message)
-			}
+		case nil:
+			testNullObject(t, evaluated, tt.input)
 		}
 	}
 }
@@ -387,6 +395,10 @@ func TestArrayIndexExpressions(t *testing.T) {
 		{
 			"let myArray = [1, 2, 3]; len(myArray);",
 			3,
+		},
+		{
+			"let myArray = [10, 15, 17]; first(myArray);",
+			10,
 		},
 	}
 
