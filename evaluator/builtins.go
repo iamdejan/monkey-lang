@@ -9,16 +9,14 @@ var builtIns = map[string]*object.BuiltIn{
 				return newError("wrong argument count for `len` function. expected=`1`, actual=`%d`", len(args))
 			}
 
-			arg := args[0]
-			if arg.Type() != object.StringObj {
-				return newError("wrong argument type for `len` function. expected=`%s`, actual=`%s`", object.StringObj, arg.Type())
+			switch arg := args[0].(type) {
+			case *object.String:
+				return &object.Integer{Value: int64(len(arg.Value))}
+			case *object.Array:
+				return &object.Integer{Value: int64(len(arg.Elements))}
+			default:
+				return newError("argument to `len` is not supported. actual=`%T`", args[0].Type())
 			}
-
-			str, ok := arg.(*object.String)
-			if !ok {
-				return newError("parse error for argument")
-			}
-			return &object.Integer{Value: int64(len(str.Value))}
 		},
 	},
 }
