@@ -201,6 +201,8 @@ func TestParsingInfixExpressions(t *testing.T) {
 		{input: "5 > 5", leftValue: 5, operator: ">", rightValue: 5},
 		{input: "5 <= 5", leftValue: 5, operator: "<=", rightValue: 5},
 		{input: "5 >= 5", leftValue: 5, operator: ">=", rightValue: 5},
+		{input: "a && b", leftValue: "a", operator: "&&", rightValue: "b"},
+		{input: "c || d", leftValue: "c", operator: "||", rightValue: "d"},
 		{input: "true == true", leftValue: true, operator: "==", rightValue: true},
 		{input: "true != false", leftValue: true, operator: "!=", rightValue: false},
 		{input: "false == false", leftValue: false, operator: "==", rightValue: false},
