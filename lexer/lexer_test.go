@@ -84,6 +84,9 @@ func TestNextToken_ArithmeticAndLogicOperators(t *testing.T) {
 	input := `
 	!-*/5;
 	5 < 10 > 5;
+	1 == 1;
+	a <= b;
+	d >= c;
 	`
 
 	tests := []token.Token{
@@ -99,6 +102,21 @@ func TestNextToken_ArithmeticAndLogicOperators(t *testing.T) {
 		{Type: token.Integer, Literal: "10"},
 		{Type: token.GreaterThan, Literal: ">"},
 		{Type: token.Integer, Literal: "5"},
+		{Type: token.Semicolon, Literal: ";"},
+
+		{Type: token.Integer, Literal: "1"},
+		{Type: token.Equal, Literal: "=="},
+		{Type: token.Integer, Literal: "1"},
+		{Type: token.Semicolon, Literal: ";"},
+
+		{Type: token.Identifier, Literal: "a"},
+		{Type: token.LessThanOrEqual, Literal: "<="},
+		{Type: token.Identifier, Literal: "b"},
+		{Type: token.Semicolon, Literal: ";"},
+
+		{Type: token.Identifier, Literal: "d"},
+		{Type: token.GreaterThanOrEqual, Literal: ">="},
+		{Type: token.Identifier, Literal: "c"},
 		{Type: token.Semicolon, Literal: ";"},
 	}
 

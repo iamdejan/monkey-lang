@@ -23,10 +23,12 @@ const (
 	Asterisk = "*"
 	Slash    = "/"
 
-	LessThan    = "<"
-	GreaterThan = ">"
-	Equal       = "=="
-	NotEqual    = "!="
+	LessThan           = "<"
+	GreaterThan        = ">"
+	Equal              = "=="
+	NotEqual           = "!="
+	LessThanOrEqual    = "<="
+	GreaterThanOrEqual = ">="
 
 	// delimiters
 	Comma     = ","
