@@ -29,6 +29,8 @@ const (
 	NotEqual           = "!="
 	LessThanOrEqual    = "<="
 	GreaterThanOrEqual = ">="
+	BooleanAnd         = "&&"
+	BooleanOr          = "||"
 
 	// delimiters
 	Comma     = ","
