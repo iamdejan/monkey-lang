@@ -56,14 +56,14 @@ var builtIns = map[string]*object.BuiltIn{
 					return Null
 				}
 				l := len(str)
-				return &object.String{Value: string(arg.Value[l - 1])}
+				return &object.String{Value: string(arg.Value[l-1])}
 			case *object.Array:
 				elements := arg.Elements
 				l := len(elements)
 				if l <= 0 {
 					return Null
 				}
-				return elements[l - 1]
+				return elements[l-1]
 			default:
 				return newError("argument to `last` method is not supported. actual=`%T`", args[0].Type())
 			}
