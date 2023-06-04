@@ -13,6 +13,7 @@ const (
 	Lowest
 	Equal         // e.g. 1 == a
 	LessOrGreater // e.g. 2 < 3 or 3 > 1
+	Boolean       // e.g. a && b or c || d
 	Sum           // e.g. 2 + 4
 	Product       // e.g. 5 * 3
 	Prefix        // e.g. -5
@@ -27,6 +28,8 @@ var precedences = map[token.TokenType]int{
 	token.GreaterThan:        LessOrGreater,
 	token.LessThanOrEqual:    LessOrGreater,
 	token.GreaterThanOrEqual: LessOrGreater,
+	token.BooleanAnd:         Boolean,
+	token.BooleanOr:          Boolean,
 	token.Plus:               Sum,
 	token.Minus:              Sum,
 	token.Slash:              Product,
@@ -81,10 +84,12 @@ func NewParser(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LessThanOrEqual, p.parseInfixExpression)
 	p.registerInfix(token.GreaterThan, p.parseInfixExpression)
 	p.registerInfix(token.GreaterThanOrEqual, p.parseInfixExpression)
+	p.registerInfix(token.BooleanAnd, p.parseInfixExpression)
+	p.registerInfix(token.BooleanOr, p.parseInfixExpression)
 	p.registerInfix(token.LeftParenthesis, p.parseCallExpression)
 	p.registerInfix(token.LeftBracket, p.parseIndexExpression)
 
-	// read 2 tokens, so that current and peek / next token are set
+	// read 2 tokens, so that current and peek (next) token are set
 	p.nextToken()
 	p.nextToken()
 

@@ -102,6 +102,32 @@ func (l *Lexer) NextToken() token.Token {
 		} else {
 			tok = newToken(token.GreaterThan, l.character)
 		}
+	case '&':
+		if l.peekChar() == '&' {
+			ch := l.character
+			l.readCharacter()
+			peek := l.character
+			tok = token.Token{
+				Type:    token.BooleanAnd,
+				Literal: string(ch) + string(peek),
+			}
+		} else {
+			// TODO: bitwise '&' operator
+			tok = newToken(token.Illegal, l.character)
+		}
+	case '|':
+		if l.peekChar() == '|' {
+			ch := l.character
+			l.readCharacter()
+			peek := l.character
+			tok = token.Token{
+				Type:    token.BooleanOr,
+				Literal: string(ch) + string(peek),
+			}
+		} else {
+			// TODO: bitwise '|' operator
+			tok = newToken(token.Illegal, l.character)
+		}
 	case '{':
 		tok = newToken(token.LeftBrace, l.character)
 	case '}':
