@@ -67,6 +67,9 @@ func TestEvalBooleanExpression(t *testing.T) {
 		{input: "(1 < 2) == true", expected: true},
 		{input: "(1 < 2) == false", expected: false},
 		{input: "(5 <= 2) == false", expected: true},
+		{input: "(1 == 1) && true", expected: true},
+		{input: "(1 == 1) && false", expected: false},
+		{input: "(1 == 1) || false", expected: true},
 	}
 
 	for _, tt := range tests {
