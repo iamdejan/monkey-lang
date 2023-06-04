@@ -304,6 +304,10 @@ func TestBuiltInFunctions(t *testing.T) {
 		// `first` method
 		{input: `first("")`, expected: nil},
 		{input: `first("four")`, expected: "f"},
+
+		// `last` method
+		{input: `last("")`, expected: nil},
+		{input: `last("four")`, expected: "r"},
 	}
 
 	for _, tt := range tests {
@@ -397,8 +401,16 @@ func TestArrayIndexExpressions(t *testing.T) {
 			3,
 		},
 		{
+			"let myArray = []; first(myArray);",
+			nil,
+		},
+		{
 			"let myArray = [10, 15, 17]; first(myArray);",
 			10,
+		},
+		{
+			"let myArray = [10, 15, 17]; last(myArray);",
+			17,
 		},
 	}
 
