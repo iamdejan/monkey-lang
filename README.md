@@ -2,6 +2,21 @@
 
 My implementation from "Writing An Interpreter in Go".
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+  * [Ubuntu](#ubuntu)
+    + [Go Language](#go-language)
+    + [Pre-commit Hook](#pre-commit-hook)
+  * [Windows 10 and 11](#windows-10-and-11)
+    + [Go Language](#go-language-1)
+    + [Pre-commit Hook](#pre-commit-hook-1)
+- [How to Run](#how-to-run)
+- [Pre-Commit Hook](#pre-commit-hook)
+- [Contribution](#contribution)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 ## Prerequisites
 
 Before you can try this, there are some things you need to setup. The setup will be different, depending on the platform.
@@ -67,3 +82,7 @@ pre-commit install --hook-type pre-push
 ```
 
 NOTE: to ease the life of the developer, we need to add a little bit of leniency for the validation, which is why the validation is done before push, not before commit. The commit will be squashed anyway, so it's okay to validate before push.
+
+## Contribution
+
+If you want to help the development process, see [CONTRIBUTING.md](./CONTRIBUTING.md).
