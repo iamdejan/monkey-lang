@@ -9,6 +9,7 @@
   * [Help The Development](#help-the-development)
     + [Example Contribution: Implement Operators](#example-contribution--implement-operators)
     + [Git Flow](#git-flow)
+  * [Improve Documentation](#improve-documentation)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
